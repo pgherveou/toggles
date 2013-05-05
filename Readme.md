@@ -1,7 +1,6 @@
-
 # toggles
 
-  on/off or multistate toggles inspired by ratchet toggles
+  on/off or multistate (work in progress) toggles inspired by ratchet toggles
 
 ## Installation
 

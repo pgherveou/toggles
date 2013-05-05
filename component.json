@@ -1,0 +1,23 @@
+{
+  "name": "toggles",
+  "repo": "pgherveou/toggles",
+  "description": "on/off or multistate toggles",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "component/emitter": "*",
+    "component/query": "*",
+    "component/bind": "*",
+    "component/translate": "*",
+    "component/classes": "*",
+    "yields/prevent": "*",
+    "pgherveou/event": "*",
+    "pgherveou/prefix": "*",
+    "pgherveou/angle": "*"
+  },
+  "development": {},
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": ["index.js"],
+  "styles": ["index.css"]
+}

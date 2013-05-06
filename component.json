@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "component/emitter": "*",
+    "component/map": "*",
     "component/query": "*",
     "component/bind": "*",
     "component/translate": "*",
@@ -13,7 +14,7 @@
     "yields/prevent": "*",
     "pgherveou/event": "*",
     "pgherveou/prefix": "*",
-    "pgherveou/angle": "*"
+    "pgherveou/transitionend": "*"
   },
   "development": {},
   "license": "MIT",

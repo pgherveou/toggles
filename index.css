@@ -1,10 +1,19 @@
-.toggle-handle{position:absolute;top:0;left:0;z-index:2;-webkit-transition:-webkit-transform .1s ease-in-out, border .1s ease-in-out;transition:transform .1s ease-in-out,border .1s ease-in-out}
-.toggle{position:relative}
-.onoff-toggle{width:75px;height:28px;background-color:#eee;border:1px solid #bbb;-webkit-border-radius:20px;border-radius:20px;-webkit-box-shadow:inset 0 0 4px rgba(0,0,0,0.1);box-shadow:inset 0 0 4px rgba(0,0,0,0.1);line-height:26px;}
-.onoff-toggle:before{position:absolute;right:13px;}
-.onoff-toggle.active:before{right:auto;left:15px}
-.onoff-toggle:before{font-weight:bold;color:#777;text-shadow:0 1px #fff;text-transform:uppercase;content:"Off"}
-.onoff-toggle .toggle-handle{width:28px;height:28px;top:-1px;left:-1px;background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(1, #f2f2f2));background-image:-webkit-linear-gradient(top, #fff 0%, #f2f2f2 100%);background-image:linear-gradient(top, #fff 0%, #f2f2f2 100%);border:1px solid rgba(0,0,0,0.2);-webkit-border-radius:50%;border-radius:50%}
-.onoff-toggle.active{background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0, #088cd4), color-stop(1, #19a8e4));background-image:-webkit-linear-gradient(top, #088cd4 0%, #19a8e4 100%);background-image:linear-gradient(top, #088cd4 0%, #19a8e4 100%);border:1px solid #096c9d;-webkit-box-shadow:inset 0 0 15px rgba(255,255,255,0.25);box-shadow:inset 0 0 15px rgba(255,255,255,0.25);}
-.onoff-toggle.active .toggle-handle{border-color:#0a76ad}
-.onoff-toggle.active:before{color:#fff;text-shadow:0 -1px rgba(0,0,0,0.25);content:"On"}
+.toggle-handle {
+	position:absolute;
+	z-index:4;
+}
+
+.toggle-progress {
+	pointer-events: none;
+	position:absolute;
+	z-index:1;
+}
+
+/*.toggle-progress, .toggle-handle {
+	-webkit-transition: all .1s ease-in-out;
+	transition: all .1s ease-in-out
+}
+*/
+.toggle {
+	position:relative
+}

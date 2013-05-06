@@ -1,0 +1,91 @@
+body {
+	margin: 50px 10px;
+	background: #f4f8f9;
+}
+
+.multi-toggle {
+	width:300px;
+	height:36px;
+	background-color: #e5edef;
+	border-radius:18px;
+	box-shadow:inset 0 1px 0px rgba(0,0,0,0.1);
+	line-height:26px;
+}
+
+
+/* toggle handle style */
+
+.toggle-handle {
+	width:60px;
+	height:60px;
+	top:-10px;
+	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
+	box-shadow: inset 0 1px 0px rgba(255,255,255,0.2), inset 0 -1px 0px rgba(0,0,0,0.2), 0 0 2px rgba(0,0,0,0.6);
+	border-radius:50%;
+}
+
+
+/* multi-toggle styles */
+
+.toggle-progress {
+	top:2px;
+	bottom: 2px;
+	left:2px;
+	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
+	border-radius: 18px 0px 0 18px
+}
+
+.toggle-states {
+	width: 100%;
+	display: -webkit-box;
+	-webkit-box-align: center;
+
+}
+
+.toggle-states [data-state] {
+	height:36px;
+	position: relative;
+}
+
+.toggle-states [data-state='state-1'] {
+	-webkit-box-flex: 1;
+}
+.toggle-states [data-state='state-2'] {
+	-webkit-box-flex: 2;
+}
+.toggle-states [data-state='state-3'] {
+	-webkit-box-flex: 2;
+}
+.toggle-states [data-state='state-4'] {
+	-webkit-box-flex: 1;
+}
+
+.point {
+	z-index: 3;
+	position: absolute;
+	top: 50%;
+	margin-top: -5px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.8);
+	box-shadow: 0 1px 0px rgba(0,0,0,0.1);
+}
+.active .point {
+	box-shadow: inset 0 1px 0px rgba(0,0,0,0.2);
+}
+
+.toggle-states > div > .point {
+	left: 50%;
+	margin-left: -5px;
+}
+
+.toggle-states :first-child .point {
+	left: 10px;
+	margin-left: 0px;
+}
+.toggle-states :last-child .point {
+	left: auto;
+	right: 10px;
+}
+

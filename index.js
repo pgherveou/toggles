@@ -2,15 +2,16 @@
  * module dependencies
  */
 
-var angle = require('angle')
-  , bind  = require('bind')
+var bind  = require('bind')
   , classes = require('classes')
   , Emitter = require('emitter')
   , Events  = require('event')
+  , map = require('map')
   , prefix = require('prefix')
   , prevent = require('prevent')
   , query = require('query')
-  , translate = require('translate');
+  , translate = require('translate')
+  , transitionend = require('transitionend');
 
 // module globals
 
@@ -22,20 +23,18 @@ var hasTouch = 'ontouchstart' in window
     end: hasTouch ? 'touchend' : 'mouseup'
   };
 
-
 /**
  * helper function
- * get event pageX or pageY position
+ * get event pageX
  *
- * @param  {String} t type X or Y
  * @param  {Event}  e
  * @return {Number} pageX or Y value
+ * @api private
  */
 
-var page = function page(t, e){
-  return (hasTouch && e.touches.length && e.touches[0]) ? e.touches[0]['page'+t] : e['page'+t];
+var pageX = function page(e){
+  return (hasTouch && e.touches.length && e.touches[0]) ? e.touches[0].pageX : e.pageX;
 };
-
 
 /**
  * Expose Toggles
@@ -52,19 +51,36 @@ module.exports = Toggles;
  */
 
 function Toggles(el) {
+  var self = this;
   this.el = el;
   this.$el = classes(el);
   this.handle = query('.toggle-handle', el);
+  this.progress = query('.toggle-progress', el);
+  this.stateNodes = query.all('[data-state]', el);
+
+  // hard coded options TODO change this
+  this.opts = {
+    transitionSpeed: 0.2,
+    easing: 'ease'
+  };
 
   // bind methods to instances
   this.startDrag = bind(this, this.startDrag);
   this.dragMove = bind(this, this.dragMove);
   this.dragEnd = bind(this, this.dragEnd);
 
+  this.states = map(this.stateNodes, function(el, i) {
+    Events.bind(el, 'click', function() {
+      self.init();
+      self.easeTo(i);
+    });
+    return el.dataset.state;
+  });
+
   // bind events
-  Events.bind(el, evs.start, this.startDrag);
-  Events.bind(el, evs.move, this.dragMove);
-  Events.bind(el, evs.end,  this.dragEnd);
+  Events.bind(this.handle, evs.start, this.startDrag);
+  Events.bind(document.body, evs.move, this.dragMove);
+  Events.bind(document.body, evs.end,  this.dragEnd);
 }
 
 /**
@@ -74,22 +90,47 @@ function Toggles(el) {
 Emitter(Toggles.prototype);
 
 /**
+ * init dimensions values
+ */
+
+Toggles.prototype.init = function() {
+  this.toggleWidth = this.el.offsetWidth;
+  this.handleWidth = this.handle.offsetWidth;
+  this.max = this.toggleWidth - this.handleWidth;
+  this.stepLength = this.toggleWidth / (this.states.length - 1);
+};
+
+/**
+ * destroy component
+ */
+
+Toggles.prototype.destroy = function() {
+  map(this.stateNodes, function(el, i) {
+    Events.off(el, 'click');
+  });
+
+  Events.off(this.handle, evs.start, this.startDrag);
+  Events.off(document.body, evs.move, this.dragMove);
+  Events.off(document.body, evs.end,  this.dragEnd);
+};
+
+/**
  * start dragging toggle handle
  *
  * @api private
  */
 
 Toggles.prototype.startDrag = function(e) {
-  this.toggleWidth = this.el.offsetWidth;
-  this.handleWidth = this.handle.offsetWidth;
-  this.halfWay     = this.toggleWidth / 2 - this.handleWidth / 2;
+  var length = this.states.length
+    , index = this.states.indexOf(this.el.dataset.state);
 
-  var offset = this.$el.has('active') ? this.toggleWidth - this.handleWidth : 0;
-  this.startDragX = page('X', e) - offset;
-  this.startDragY = page('Y', e);
+  this.init();
+  this.startDragX = pageX(e);
+  this.offset = index ? index/(length -1) * this.toggleWidth - this.handleWidth / 2 : 0;
 
   this.el.style[transition] = '';
-  this.isDragging  = true;
+  this.isDragging = true;
+  this.$el.add('toggles-dragging');
   this.distanceX = 0;
 };
 
@@ -101,30 +142,27 @@ Toggles.prototype.startDrag = function(e) {
 
 Toggles.prototype.dragMove = function(e) {
   if (!this.isDragging) return;
-
   e = e.originalEvent || e;
   if (hasTouch && e.touches.length && e.touches.length > 1) return; // Exit if a pinch
 
-  var pageX = page('X', e)
-    , pageY = page('Y', e)
-    , offset = this.toggleWidth - this.handleWidth
-    , distanceY = pageY - this.startDragY;
-
-  this.distanceX = pageX - this.startDragX;
-
-  // return if angle > 45°
-  if (Math.abs(this.distanceX) < Math.abs(distanceY)) return;
   prevent(e);
+  this.distanceX = pageX(e) - this.startDragX;
+  var offsetDistance = this.distanceX + this.offset;
 
-  if (this.distanceX < 0) return translate(this.handle, 0, 0);
-  if (this.distanceX > offset) return translate(this.handle, offset, 0, 0);
-  translate(this.handle, this.distanceX, 0);
 
-  if (this.distanceX > this.halfWay) {
-    this.$el.add('active');
+  if (offsetDistance < 0) {
+    translate(this.handle, 0, 0);
+    this.distanceX = 0;
+  } else if (offsetDistance > this.max) {
+    translate(this.handle, this.max, 0, 0);
+    this.distanceX = this.max;
   } else {
-    this.$el.remove('active');
+    translate(this.handle, offsetDistance, 0);
+    this.progress.style.width = offsetDistance + this.handleWidth/2;
   }
+
+  var index = Math.ceil((this.states.length -1)* (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
+  this.update(index);
 };
 
 /**
@@ -136,24 +174,100 @@ Toggles.prototype.dragMove = function(e) {
 Toggles.prototype.dragEnd = function(e) {
   if (!this.isDragging) return;
   this.isDragging = false;
+  this.$el.remove('toggles-dragging');
 
-  var offset = this.toggleWidth - this.handleWidth,
-      slideOn = (!this.distanceX && !this.$el.has('active')) // touch to toggle
-             || this.$el.has('active') && (this.distanceX > this.halfWay); // > halfway
+  var length = this.states.length
+    , offsetDistance = this.distanceX + this.offset
+    , index;
 
-  if (slideOn) {
-    translate(this.handle, offset, 0, 0);
-    this.$el.add('active');
+  if (offsetDistance < this.stepLength / 2 - this.handleWidth / 2) {
+    index = 0;
+  } else if (offsetDistance > this.toggleWidth - this.stepLength / 2 - this.handleWidth / 2) {
+    index = length - 1;
   } else {
-    this.$el.remove('active');
-    translate(this.handle, 0, 0, 0);
+    index = Math.ceil((offsetDistance + this.handleWidth / 2 - this.stepLength / 2) / this.stepLength);
   }
 
-  this.emit('toggle', {isActive: slideOn});
+  this.easeTo(index);
 };
 
 /**
- * pluginify
+ * animate animation
+ * @param  {Number} index
+ *
+ * @api private
+ */
+
+Toggles.prototype.easeTo = function(index) {
+  var self = this
+    , length = this.states.length
+    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0)
+    , state = this.el.dataset.state;
+
+  this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+  this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+
+  Events.once(this.handle, transitionend, function() {
+    var newState = self.states[index];
+    self.progress.style[transition] = '';
+    self.handle.style[transition] = '';
+    self.$el.remove('toggles-animating');
+    self.update(index);
+    if (newState !== state) {
+      self.el.dataset.state = newState;
+      self.emit('toggle', {index: index, state: newState});
+    }
+  });
+
+  this.$el.add('toggles-animating');
+  this.setStateIndex(index);
+};
+
+/**
+ * set state index
+ *
+ * @api private
+ */
+
+Toggles.prototype.setStateIndex = function(index) {
+  var length = this.states.length
+    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
+
+  translate(this.handle, x, 0, 0);
+  this.progress.style.width = x + this.handleWidth/2;
+};
+
+/**
+ * set state
+ *
+ * @api public
+ */
+
+Toggles.prototype.setState = function(state) {
+  var index = this.states.indexOf(state);
+  this.setStateIndex(index);
+  this.update(index);
+};
+
+/**
+ * add an active class on currently active state nodes
+ *
+ * @api private
+ */
+
+Toggles.prototype.update = function(index) {
+  Array.prototype.slice.call(this.stateNodes, 0, index).forEach(function(el) {
+    classes(el).add('active');
+  });
+  Array.prototype.slice.call(this.stateNodes, index + 1).forEach(function(el) {
+    classes(el).remove('active');
+  });
+};
+
+/**
+ * make toggles a zepto/jquery plugin
+ *
+ * @api public
  */
 
 Toggles.plugin = function($) {

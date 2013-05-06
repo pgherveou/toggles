@@ -1,6 +1,6 @@
 # toggles
 
-  on/off or multistate (work in progress) toggles inspired by ratchet toggles
+  multistate toggles inspired by ratchet toggles
 
 ## Installation
 
@@ -8,19 +8,13 @@
 
 ## API
 
-```js
-var Toggles = require('toggles')
-  , el = document.querySelector('.toggle')
-  , toggles = new Toggles(el);
-
-toggles.on('toggle', function (state) {
-  console.log('toggled?', state.isActive);
-});
-```
+view demo
 
 ## License
 
   MIT
 
+## TODO
 
+	this is a work in progress
 

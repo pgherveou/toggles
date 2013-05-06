@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <title>Toggles</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+  </head>
+  <body>
+    <div class="toggle multi-toggle" data-state='state-1'>
+      <div class="toggle-handle"></div>
+      <div class="toggle-progress"></div>
+      <div class="toggle-states">
+        <div data-state='state-1'><div class="point"></div></div>
+        <div data-state='state-2'><div class="point"></div></div>
+        <div data-state='state-3'><div class="point"></div></div>
+        <div data-state='state-4'><div class="point"></div></div>
+      </div>
+    </div>
+
+    <link rel="stylesheet" type="text/css" href="demo.css">
+    <link rel="stylesheet" type="text/css" href="../build/build.css">
+    <script src="../build/build.js"></script>
+    <script>
+      var Toggles = require('toggles')
+        , multi = new Toggles(document.querySelector('.multi-toggle'));
+
+      multi.on('toggle', function (state) {
+        console.log('multi toggled', state);
+      });
+
+    </script>
+  </body>
+</html>

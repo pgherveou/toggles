@@ -158,7 +158,7 @@ Toggles.prototype.dragMove = function(e) {
     this.distanceX = this.max;
   } else {
     translate(this.handle, offsetDistance, 0);
-    this.progress.style.width = offsetDistance + this.handleWidth/2;
+    this.progress.style.width = (offsetDistance + this.handleWidth/2) + 'px';
   }
 
   var index = Math.ceil((this.states.length -1)* (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
@@ -234,7 +234,7 @@ Toggles.prototype.setStateIndex = function(index) {
     , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
 
   translate(this.handle, x, 0, 0);
-  this.progress.style.width = x + this.handleWidth/2;
+  this.progress.style.width = (x + this.handleWidth/2) + 'px';
 };
 
 /**

@@ -204,8 +204,8 @@ Toggles.prototype.easeTo = function(index) {
     , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0)
     , state = this.el.dataset.state;
 
-  this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
   this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+  this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
   this.update(index);
 
   Events.once(this.handle, transitionend, function() {

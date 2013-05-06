@@ -16,15 +16,19 @@
       </div>
     </div>
 
+    <textarea class="log">
+    </textarea>
+
     <link rel="stylesheet" type="text/css" href="demo.css">
     <link rel="stylesheet" type="text/css" href="../build/build.css">
     <script src="../build/build.js"></script>
     <script>
       var Toggles = require('toggles')
-        , multi = new Toggles(document.querySelector('.multi-toggle'));
+        , multi = new Toggles(document.querySelector('.multi-toggle'))
+        , log = document.querySelector('.log');
 
       multi.on('toggle', function (state) {
-        console.log('multi toggled', state);
+        log.value = JSON.stringify(state) + '\n' + log.value
       });
 
     </script>

@@ -206,13 +206,13 @@ Toggles.prototype.easeTo = function(index) {
 
   this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
   this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+  this.update(index);
 
   Events.once(this.handle, transitionend, function() {
     var newState = self.states[index];
     self.progress.style[transition] = '';
     self.handle.style[transition] = '';
     self.$el.remove('toggles-animating');
-    self.update(index);
     if (newState !== state) {
       self.el.dataset.state = newState;
       self.emit('toggle', {index: index, state: newState});

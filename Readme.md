@@ -16,5 +16,5 @@ view demo
 
 ## TODO
 
-	this is a work in progress
+work in progress...
 

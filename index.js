@@ -60,7 +60,7 @@ function Toggles(el) {
 
   // hard coded options TODO change this
   this.opts = {
-    transitionSpeed: 0.2,
+    transitionSpeed: 0.3,
     easing: 'ease'
   };
 
@@ -233,8 +233,8 @@ Toggles.prototype.setStateIndex = function(index) {
   var length = this.states.length
     , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
 
-  translate(this.handle, x, 0, 0);
   this.progress.style.width = (x + this.handleWidth/2) + 'px';
+  translate(this.handle, x, 0, 0);
 };
 
 /**

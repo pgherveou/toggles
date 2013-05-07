@@ -11,12 +11,14 @@ var bind  = require('bind')
   , prevent = require('prevent')
   , query = require('query')
   , translate = require('translate')
+  , has3d = require('has-translate3d')
   , transitionend = require('transitionend');
 
 // module globals
 
 var hasTouch = 'ontouchstart' in window
   , transition = prefix('transition')
+  , transform = prefix('transform')
   , evs = {
     start: hasTouch ? 'touchstart' : 'mousedown',
     move: hasTouch ? 'touchmove' : 'mousemove',
@@ -55,8 +57,10 @@ function Toggles(el) {
   this.el = el;
   this.$el = classes(el);
   this.handle = query('.toggle-handle', el);
-  this.progress = query('.toggle-progress', el);
   this.stateNodes = query.all('[data-state]', el);
+
+  this.progress = query('.toggle-progress', el);
+  if (has3d) this.progress.style.width = '1px';
 
   // hard coded options TODO change this
   this.opts = {
@@ -151,14 +155,13 @@ Toggles.prototype.dragMove = function(e) {
 
 
   if (offsetDistance < 0) {
-    translate(this.handle, 0, 0);
+    this.move(0);
     this.distanceX = 0;
   } else if (offsetDistance > this.max) {
-    translate(this.handle, this.max, 0, 0);
+    this.move(this.max);
     this.distanceX = this.max;
   } else {
-    translate(this.handle, offsetDistance, 0);
-    this.progress.style.width = (offsetDistance + this.handleWidth/2) + 'px';
+    this.move(offsetDistance);
   }
 
   var index = Math.ceil((this.states.length -1)* (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
@@ -232,8 +235,21 @@ Toggles.prototype.easeTo = function(index) {
 Toggles.prototype.setStateIndex = function(index) {
   var length = this.states.length
     , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
+  this.move(x);
+};
 
-  this.progress.style.width = (x + this.handleWidth/2) + 'px';
+/**
+ * move handle and progress
+ *
+ * @api private
+ */
+
+Toggles.prototype.move = function(x) {
+  if (has3d) {
+    this.progress.style[transform] = 'scale3d(' + x + ', 1, 1)';
+  } else {
+    this.progress.style.width = x + 'px';
+  }
   translate(this.handle, x, 0, 0);
 };
 

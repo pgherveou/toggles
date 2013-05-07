@@ -3,6 +3,12 @@ body {
 	background: #333;
 }
 
+.multi-toggle, .multi-toggle * {
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+}
+
 textarea {
 	margin: 20px 0px;
 	width: 300px;
@@ -36,9 +42,19 @@ textarea {
 .toggle-progress {
 	top:2px;
 	bottom: 2px;
-	left:2px;
+	left:30px;
 	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
-	border-radius: 18px 0px 0 18px
+	/*border-radius: 18px 0px 0 18px*/
+}
+
+.pre-progress {
+	top:2px;
+	bottom: 2px;
+	left:2px;
+	width: 30px;
+	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
+	border-radius: 18px 0px 0 18px;
+	position: absolute;
 }
 
 .toggle-states {
@@ -70,9 +86,9 @@ textarea {
 	z-index: 3;
 	position: absolute;
 	top: 50%;
-	margin-top: -5px;
-	width: 10px;
-	height: 10px;
+	margin-top: -7px;
+	width: 14px;
+	height: 14px;
 	border-radius: 50%;
 	background: rgba(255, 255, 255, 0.8);
 	box-shadow: 0 1px 0px rgba(0,0,0,0.1);

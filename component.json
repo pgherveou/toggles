@@ -17,7 +17,11 @@
     "pgherveou/prefix": "*",
     "pgherveou/transitionend": "*"
   },
-  "development": {},
+
+  "development": {
+    "ftlabs/fastclick": "*"
+  },
+
   "license": "MIT",
   "main": "index.js",
   "scripts": ["index.js"],

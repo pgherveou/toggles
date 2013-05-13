@@ -25,8 +25,12 @@
     <script src="../build/build.js"></script>
     <script>
       var Toggles = require('toggles')
+        , FastClick = require('fastclick')
         , multi = new Toggles(document.querySelector('.multi-toggle'))
         , log = document.querySelector('.log');
+
+      // fast click for mobile demo
+      new FastClick(document.body);
 
       multi.on('toggle', function (state) {
         log.value = JSON.stringify(state) + '\n' + log.value

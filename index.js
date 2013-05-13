@@ -69,7 +69,7 @@ function Toggles(el) {
   };
 
   // bind methods to instances
-  this.startDrag = bind(this, this.startDrag);
+  this.dragStart = bind(this, this.dragStart);
   this.dragMove = bind(this, this.dragMove);
   this.dragEnd = bind(this, this.dragEnd);
 
@@ -82,7 +82,7 @@ function Toggles(el) {
   });
 
   // bind events
-  Events.bind(this.handle, evs.start, this.startDrag);
+  Events.bind(this.handle, evs.start, this.dragStart);
   Events.bind(document.body, evs.move, this.dragMove);
   Events.bind(document.body, evs.end,  this.dragEnd);
 }
@@ -113,7 +113,7 @@ Toggles.prototype.destroy = function() {
     Events.off(el, 'click');
   });
 
-  Events.off(this.handle, evs.start, this.startDrag);
+  Events.off(this.handle, evs.start, this.dragStart);
   Events.off(document.body, evs.move, this.dragMove);
   Events.off(document.body, evs.end,  this.dragEnd);
 };
@@ -124,18 +124,18 @@ Toggles.prototype.destroy = function() {
  * @api private
  */
 
-Toggles.prototype.startDrag = function(e) {
+Toggles.prototype.dragStart = function(e) {
   var length = this.states.length
     , index = this.states.indexOf(this.el.dataset.state);
 
   this.init();
-  this.startDragX = pageX(e);
+  this.isDragging = true;
+  this.distanceX = 0;
+  this.dragStartX = pageX(e);
   this.offset = index ? index/(length -1) * this.toggleWidth - this.handleWidth / 2 : 0;
 
   this.el.style[transition] = '';
-  this.isDragging = true;
   this.$el.add('toggles-dragging');
-  this.distanceX = 0;
 };
 
 /**
@@ -150,16 +150,13 @@ Toggles.prototype.dragMove = function(e) {
   if (hasTouch && e.touches.length && e.touches.length > 1) return; // Exit if a pinch
 
   prevent(e);
-  this.distanceX = pageX(e) - this.startDragX;
+  this.distanceX = pageX(e) - this.dragStartX;
   var offsetDistance = this.distanceX + this.offset;
-
 
   if (offsetDistance < 0) {
     this.move(0);
-    this.distanceX = 0;
   } else if (offsetDistance > this.max) {
     this.move(this.max);
-    this.distanceX = this.max;
   } else {
     this.move(offsetDistance);
   }
@@ -183,6 +180,7 @@ Toggles.prototype.dragEnd = function(e) {
     , offsetDistance = this.distanceX + this.offset
     , index;
 
+
   if (offsetDistance < this.stepLength / 2 - this.handleWidth / 2) {
     index = 0;
   } else if (offsetDistance > this.toggleWidth - this.stepLength / 2 - this.handleWidth / 2) {
@@ -204,14 +202,14 @@ Toggles.prototype.dragEnd = function(e) {
 Toggles.prototype.easeTo = function(index) {
   var self = this
     , length = this.states.length
-    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0)
-    , state = this.el.dataset.state;
+    , state = this.el.dataset.state
+    , next;
 
   this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
   this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
   this.update(index);
 
-  Events.once(this.handle, transitionend, function() {
+  next = function() {
     var newState = self.states[index];
     self.progress.style[transition] = '';
     self.handle.style[transition] = '';
@@ -220,22 +218,25 @@ Toggles.prototype.easeTo = function(index) {
       self.el.dataset.state = newState;
       self.emit('toggle', {index: index, state: newState});
     }
-  });
+  };
 
-  this.$el.add('toggles-animating');
-  this.setStateIndex(index);
+  if (this.moveToIndex(index)) {
+    this.$el.add('toggles-animating');
+    Events.once(this.handle, transitionend, next);
+  } else
+    next();
 };
 
 /**
- * set state index
+ * move handle to index
  *
  * @api private
  */
 
-Toggles.prototype.setStateIndex = function(index) {
+Toggles.prototype.moveToIndex = function(index) {
   var length = this.states.length
     , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
-  this.move(x);
+  return this.move(x);
 };
 
 /**
@@ -245,12 +246,16 @@ Toggles.prototype.setStateIndex = function(index) {
  */
 
 Toggles.prototype.move = function(x) {
-  if (has3d) {
+  if (this.x === x) return false;
+
+  if (has3d)
     this.progress.style[transform] = 'scale3d(' + x + ', 1, 1)';
-  } else {
+  else
     this.progress.style.width = x + 'px';
-  }
+
   translate(this.handle, x, 0, 0);
+  this.x = x;
+  return true;
 };
 
 /**
@@ -261,7 +266,7 @@ Toggles.prototype.move = function(x) {
 
 Toggles.prototype.setState = function(state) {
   var index = this.states.indexOf(state);
-  this.setStateIndex(index);
+  this.moveToIndex(index);
   this.update(index);
 };
 

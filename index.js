@@ -11,7 +11,6 @@ var bind  = require('bind')
   , prevent = require('prevent')
   , query = require('query')
   , translate = require('translate')
-  , has3d = require('has-translate3d')
   , transitionend = require('transitionend');
 
 // module globals
@@ -58,9 +57,7 @@ function Toggles(el) {
   this.$el = classes(el);
   this.handle = query('.toggle-handle', el);
   this.stateNodes = query.all('[data-state]', el);
-
   this.progress = query('.toggle-progress', el);
-  if (has3d) this.progress.style.width = '1px';
 
   // hard coded options TODO change this
   this.opts = {
@@ -85,6 +82,9 @@ function Toggles(el) {
   Events.bind(this.handle, evs.start, this.dragStart);
   Events.bind(document.body, evs.move, this.dragMove);
   Events.bind(document.body, evs.end,  this.dragEnd);
+
+  this.init();
+  this.setState(this.el.dataset.state);
 }
 
 /**
@@ -247,12 +247,7 @@ Toggles.prototype.moveToIndex = function(index) {
 
 Toggles.prototype.move = function(x) {
   if (this.x === x) return false;
-
-  if (has3d)
-    this.progress.style[transform] = 'scale3d(' + x + ', 1, 1)';
-  else
-    this.progress.style.width = x + 'px';
-
+  translate(this.progress, (-this.toggleWidth + x + this.handleWidth/2), 0, 0);
   translate(this.handle, x, 0, 0);
   this.x = x;
   return true;

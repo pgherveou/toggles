@@ -1,12 +1,22 @@
 body {
 	margin: 50px 10px;
 	background: #333;
+	font-family: "helvetica"
+}
+
+#grad-test {
+	margin: 100px auto;
+	width: 200px;
+	height: 200px;
+	background-color: green;
 }
 
 .multi-toggle, .multi-toggle * {
+	box-sizing: border-box;
 	-webkit-tap-highlight-color: rgba(0,0,0,0);
   -webkit-touch-callout: none;
   -webkit-user-select: none;
+  user-select: none;
 }
 
 textarea {
@@ -20,10 +30,12 @@ textarea {
 	width:300px;
 	margin: auto;
 	height:36px;
+	line-height:36px;
+}
+
+.multi-toggle-4 .toggle-progress-wrap {
 	background-color: #e5edef;
-	border-radius:18px;
 	box-shadow:inset 0 1px 0px rgba(0,0,0,0.1);
-	line-height:26px;
 }
 
 .multi-toggle-4 .toggle-handle {
@@ -36,45 +48,82 @@ textarea {
 	border-radius:50%;
 }
 
-.multi-toggle-2 {
-	width:80px;
-	margin: auto;
-	height:26px;
-	background-color: #e5edef;
-	border-radius:18px;
-	box-shadow:inset 0 1px 0px rgba(0,0,0,0.1);
-	line-height:16px;
+.toggle-progress-fill {
+	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
 }
+
+.multi-toggle-2 .toggle-progress-fill, .multi-toggle-2 .toggle-progress-empty {
+	text-align: center;
+	text-transform: uppercase;
+	line-height: 36px;
+}
+
+.multi-toggle-2 .toggle-progress-fill {
+	padding-left: 15px;
+	color: white;
+}
+
+.multi-toggle-2 .toggle-progress-empty {
+	padding-right: 15px;
+	color: #333;
+}
+
+.multi-toggle-2 {
+	width:100px;
+	margin: auto;
+	height:36px;
+	line-height:16px;
+	background-size: 20px 100%;
+}
+
+.multi-toggle-2 .toggle-progress-wrap {
+	background-color: #e5edef;
+	box-shadow:inset 0 1px 0px rgba(0,0,0,0.1);
+}
+
 
 .multi-toggle-2 .toggle-handle {
 	width:40px;
 	height:40px;
-	top:-7px;
+	top:-2px;
 	left:-1px;
 	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
 	box-shadow: inset 0 1px 0px rgba(255,255,255,0.2), inset 0 -1px 0px rgba(0,0,0,0.2), 0 0 2px rgba(0,0,0,0.6);
 	border-radius:50%;
 }
 
-/* multi-toggle styles */
+.multi-toggle-2 .toggle-progress-wrap {
+ 	-webkit-mask-image: url('/images/mask.png');
+}
+
+.multi-toggle-4 .toggle-progress-wrap {
+ 	-webkit-mask-image: url('/images/big-mask.png');
+
+}
+
+.toggle-progress-fill, .toggle-progress-empty {
+	width: 50%;
+}
+
+
+.toggle-progress-wrap {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	overflow: hidden;
+}
 
 .toggle-progress {
-	top:2px;
-	bottom: 2px;
-	left:30px;
-	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
-	/*border-radius: 18px 0px 0 18px*/
+	-webkit-transform: translate3d(-100%, 0px, 0);
+	display: -webkit-box;
+	position: absolute;
+	height: 100%;
+	width: 200%;
 }
 
-.pre-progress {
-	top:2px;
-	bottom: 2px;
-	left:2px;
-	width: 30px;
-	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
-	border-radius: 18px 0px 0 18px;
-	position: absolute;
-}
+
+/* multi-toggle styles */
+
 
 .toggle-states {
 	width: 100%;
@@ -94,8 +143,6 @@ textarea {
 .toggle-states [data-state='on'] {
 	-webkit-box-flex: 1;
 }
-
-
 
 .toggle-states [data-state='state-1'] {
 	-webkit-box-flex: 1;

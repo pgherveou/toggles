@@ -5,10 +5,13 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
   <body>
-    <div class="toggle multi-toggle multi-toggle-4" data-state='state-1'>
+    <div class="toggle multi-toggle multi-toggle-4" data-state='state-2'>
       <div class="toggle-handle"></div>
-      <div class="pre-progress"></div>
-      <div class="toggle-progress"></div>
+      <div class="toggle-progress-wrap">
+        <div class="toggle-progress">
+          <div class="toggle-progress-fill"></div>
+        </div>
+      </div>
       <div class="toggle-states">
         <div data-state='state-1'><div class="point"></div></div>
         <div data-state='state-2'><div class="point"></div></div>
@@ -21,12 +24,19 @@
 
     <div class="toggle multi-toggle multi-toggle-2" data-state='off'>
       <div class="toggle-handle"></div>
-      <div class="pre-progress"></div>
-      <div class="toggle-progress"></div>
+
+      <div class="toggle-progress-wrap">
+        <div class="toggle-progress">
+          <div class="toggle-progress-fill">On</div>
+          <div class="toggle-progress-empty">Off</div>
+        </div>
+      </div>
+
       <div class="toggle-states">
         <div data-state='off'></div>
         <div data-state='on'></div>
       </div>
+
     </div>
 
     <textarea class="log">

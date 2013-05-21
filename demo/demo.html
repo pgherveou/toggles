@@ -5,7 +5,7 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
   </head>
   <body>
-    <div class="toggle multi-toggle" data-state='state-1'>
+    <div class="toggle multi-toggle multi-toggle-4" data-state='state-1'>
       <div class="toggle-handle"></div>
       <div class="pre-progress"></div>
       <div class="toggle-progress"></div>
@@ -14,6 +14,18 @@
         <div data-state='state-2'><div class="point"></div></div>
         <div data-state='state-3'><div class="point"></div></div>
         <div data-state='state-4'><div class="point"></div></div>
+      </div>
+    </div>
+
+    <div style="padding: 40px 0" />
+
+    <div class="toggle multi-toggle multi-toggle-2" data-state='off'>
+      <div class="toggle-handle"></div>
+      <div class="pre-progress"></div>
+      <div class="toggle-progress"></div>
+      <div class="toggle-states">
+        <div data-state='off'></div>
+        <div data-state='on'></div>
       </div>
     </div>
 
@@ -26,14 +38,21 @@
     <script>
       var Toggles = require('toggles')
         , FastClick = require('fastclick')
-        , multi = new Toggles(document.querySelector('.multi-toggle'))
-        , log = document.querySelector('.log');
+        , log = document.querySelector('.log')
 
       // fast click for mobile demo
       new FastClick(document.body);
 
-      multi.on('toggle', function (state) {
-        log.value = JSON.stringify(state) + '\n' + log.value
+      window.tog4 = new Toggles(document.querySelector('.multi-toggle-4'))
+      window.tog2 = new Toggles(document.querySelector('.multi-toggle-2'));
+
+
+      tog4.on('toggle', function (state) {
+        log.value = "toggle-4: " + JSON.stringify(state) + '\n' + log.value
+      });
+
+      tog2.on('toggle', function (state) {
+        log.value = "toggle-2: " + JSON.stringify(state) + '\n' + log.value
       });
 
     </script>

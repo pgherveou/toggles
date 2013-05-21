@@ -99,7 +99,7 @@ Emitter(Toggles.prototype);
 
 Toggles.prototype.init = function() {
   this.toggleWidth = this.el.offsetWidth;
-  this.handleWidth = this.handle.offsetWidth;
+  this.handleWidth = this.handle.offsetWidth - 2;
   this.max = this.toggleWidth - this.handleWidth;
   this.stepLength = this.toggleWidth / (this.states.length - 1);
 };

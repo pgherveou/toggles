@@ -16,7 +16,7 @@ textarea {
 	display: block;
 }
 
-.multi-toggle {
+.multi-toggle-4 {
 	width:300px;
 	margin: auto;
 	height:36px;
@@ -26,18 +26,35 @@ textarea {
 	line-height:26px;
 }
 
-
-/* toggle handle style */
-
-.toggle-handle {
+.multi-toggle-4 .toggle-handle {
 	width:60px;
 	height:60px;
 	top:-10px;
+	left:-1px;
 	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
 	box-shadow: inset 0 1px 0px rgba(255,255,255,0.2), inset 0 -1px 0px rgba(0,0,0,0.2), 0 0 2px rgba(0,0,0,0.6);
 	border-radius:50%;
 }
 
+.multi-toggle-2 {
+	width:80px;
+	margin: auto;
+	height:26px;
+	background-color: #e5edef;
+	border-radius:18px;
+	box-shadow:inset 0 1px 0px rgba(0,0,0,0.1);
+	line-height:16px;
+}
+
+.multi-toggle-2 .toggle-handle {
+	width:40px;
+	height:40px;
+	top:-7px;
+	left:-1px;
+	background-image: -webkit-linear-gradient(-90deg, #fc575e 0%, #a41318 100%);
+	box-shadow: inset 0 1px 0px rgba(255,255,255,0.2), inset 0 -1px 0px rgba(0,0,0,0.2), 0 0 2px rgba(0,0,0,0.6);
+	border-radius:50%;
+}
 
 /* multi-toggle styles */
 
@@ -70,6 +87,15 @@ textarea {
 	height:36px;
 	position: relative;
 }
+
+.toggle-states [data-state='off'] {
+	-webkit-box-flex: 1;
+}
+.toggle-states [data-state='on'] {
+	-webkit-box-flex: 1;
+}
+
+
 
 .toggle-states [data-state='state-1'] {
 	-webkit-box-flex: 1;

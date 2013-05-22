@@ -49,6 +49,11 @@ module.exports = Toggles;
  */
 
 Toggles.template = function(locals) {
+  if (!local) locals = {};
+  if (!locals.state) locals.state = locals.states[0];
+  if (!locals.className) locals.className = '';
+  if (!locals.fillText) locals.fillText = '';
+  if (!locals.emptyText) locals.emptyText = '';
   return require('./template')(locals);
 };
 

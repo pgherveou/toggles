@@ -52,6 +52,7 @@ Toggles.template = function(locals) {
   if (!locals) locals = {};
   if (!locals.state) locals.state = locals.states[0];
   if (!locals.className) locals.className = '';
+  if (!locals.handleClass) locals.handleClass = '';
   if (!locals.fillText) locals.fillText = '';
   if (!locals.emptyText) locals.emptyText = '';
   return require('./template')(locals);

@@ -125,12 +125,12 @@ Toggles.prototype.init = function() {
 
 Toggles.prototype.destroy = function() {
   map(this.stateNodes, function(el, i) {
-    Events.off(el, 'click');
+    Events.unbind(el, 'click');
   });
 
-  Events.off(this.handle, evs.start, this.dragStart);
-  Events.off(document.body, evs.move, this.dragMove);
-  Events.off(document.body, evs.end,  this.dragEnd);
+  Events.unbind(this.handle, evs.start, this.dragStart);
+  Events.unbind(document.body, evs.move, this.dragMove);
+  Events.unbind(document.body, evs.end,  this.dragEnd);
 };
 
 /**

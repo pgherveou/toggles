@@ -7,17 +7,12 @@
 	z-index:4;
 }
 
-.toggle-progress {
-	pointer-events: none;
-	position:absolute;
-	z-index:1;
-}
-
 .toggle-progress-fill, .toggle-progress-empty {
 	width: 50%;
 }
 
 .toggle-progress-wrap {
+	pointer-events: none;
 	position: absolute;
 	overflow: hidden;
 	height: 100%;
@@ -26,6 +21,7 @@
 
 .toggle-progress {
 	position: absolute;
+	z-index:1;
 	width: 200%;
 	height: 100%;
 }

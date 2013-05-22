@@ -3,7 +3,7 @@ module.exports =
 function anonymous(locals) {
 var buf = [];
 with (locals || {}) {
-buf.push("<div" + (jade.attrs({ 'data-state':(state), "class": ('toggle') + ' ' + (name) }, {"class":true,"data-state":true})) + "><div class=\"toggle-handle\"></div><div class=\"toggle-progress-wrap\"><div class=\"toggle-progress\"><div class=\"toggle-progress-fill\"></div></div></div><div class=\"toggle-states\">");
+buf.push("<div" + (jade.attrs({ 'data-state':(state), "class": ('toggle') + ' ' + (name) }, {"class":true,"data-state":true})) + "><div class=\"toggle-handle\"></div><div class=\"toggle-progress-wrap\"><div class=\"toggle-progress\"><div class=\"toggle-progress-fill\"></div><div class=\"toggle-progress-empty\"></div></div></div><div class=\"toggle-states\">");
 // iterate states
 ;(function(){
   var $$obj = states;

@@ -50,6 +50,15 @@
         , FastClick = require('fastclick')
         , log = document.querySelector('.log')
 
+
+      console.log(Toggles.template({
+          name: 'multi-toggle-4',
+          state: 'state-2',
+          states: ['state-1', 'state-2', 'state-3', 'state-4'],
+          marker: '.point'
+        }));
+
+
       // fast click for mobile demo
       new FastClick(document.body);
 

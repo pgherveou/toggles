@@ -44,6 +44,15 @@ var pageX = function page(e){
 module.exports = Toggles;
 
 /**
+ * Static template generator
+ * TODO make it a plain string template
+ */
+
+Toggles.template = function(locals) {
+  return require('./template')(locals);
+};
+
+/**
  * Initialize a new `Toggles`
  *
  * @param {Element} el

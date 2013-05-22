@@ -2,28 +2,34 @@
   "name": "toggles",
   "repo": "pgherveou/toggles",
   "description": "on/off or multistate toggles",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [],
   "dependencies": {
-    "component/emitter": "*",
-    "component/map": "*",
-    "component/query": "*",
     "component/bind": "*",
-    "component/translate": "*",
-    "component/has-translate3d": "*",
     "component/classes": "*",
-    "yields/prevent": "*",
+    "component/emitter": "*",
     "pgherveou/event": "*",
+    "component/map": "*",
     "pgherveou/prefix": "*",
-    "pgherveou/transitionend": "*"
+    "yields/prevent": "*",
+    "component/query": "*",
+    "component/translate": "*",
+    "pgherveou/transitionend": "*",
+    "visionmedia/jade": "*"
   },
-
+  "optional": {
+    "visionmedia/jade": "*"
+  },
   "development": {
     "ftlabs/fastclick": "*"
   },
-
   "license": "MIT",
   "main": "index.js",
-  "scripts": ["index.js"],
-  "styles": ["index.css"]
+  "scripts": [
+    "index.js",
+    "template.js"
+  ],
+  "styles": [
+    "index.css"
+  ]
 }

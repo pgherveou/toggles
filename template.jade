@@ -1,0 +1,10 @@
+.toggle(class=name, data-state=state)
+  .toggle-handle
+  .toggle-progress-wrap
+    .toggle-progress
+      .toggle-progress-fill
+  .toggle-states
+    each state in states
+      div(data-state=state)
+        if typeof stateMarker != 'undefined'
+          div(class=stateMarker)

@@ -2,8 +2,8 @@
   .toggle-handle
   .toggle-progress-wrap
     .toggle-progress
-      .toggle-progress-fill
-      .toggle-progress-empty
+      .toggle-progress-fill= fillText || ''
+      .toggle-progress-empty= emptyText || ''
   .toggle-states
     each state in states
       div(data-state=state)

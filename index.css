@@ -1,3 +1,7 @@
+.toggle {
+	position:relative
+}
+
 .toggle-handle {
 	position:absolute;
 	z-index:4;
@@ -7,17 +11,22 @@
 	pointer-events: none;
 	position:absolute;
 	z-index:1;
-	-webkit-transform-origin: 0 0;
-	-moz-transform-origin: 0 0;
-	-ms-transform-origin: 0 0;
-	transform-origin: 0 0;
 }
 
-/*.toggle-progress, .toggle-handle {
-	-webkit-transition: all .1s ease-in-out;
-	transition: all .1s ease-in-out
+.toggle-progress-fill, .toggle-progress-empty {
+	width: 50%;
 }
-*/
-.toggle {
-	position:relative
+
+.toggle-progress-wrap {
+	position: absolute;
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
 }
+
+.toggle-progress {
+	position: absolute;
+	width: 200%;
+	height: 100%;
+}
+

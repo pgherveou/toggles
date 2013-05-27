@@ -12,10 +12,14 @@ buf.push("<div" + (jade.attrs({ 'data-state':(state), "class": ('toggle') + ' ' 
     for (var $index = 0, $$l = $$obj.length; $index < $$l; $index++) {
       var state = $$obj[$index];
 
-buf.push("<div" + (jade.attrs({ 'data-state':(state) }, {"data-state":true})) + ">");
+buf.push("<div" + (jade.attrs({ 'data-state':(state.name) }, {"data-state":true})) + ">");
 if ( typeof stateMarker != 'undefined')
 {
 buf.push("<div" + (jade.attrs({ "class": (stateMarker) }, {"class":true})) + "></div>");
+}
+if ( state.label)
+{
+buf.push("<div class=\"state-label\">" + (jade.escape(null == (jade.interp = state.label) ? "" : jade.interp)) + "</div>");
 }
 buf.push("</div>");
     }
@@ -25,10 +29,14 @@ buf.push("</div>");
     for (var $index in $$obj) {
       $$l++;      if ($$obj.hasOwnProperty($index)){      var state = $$obj[$index];
 
-buf.push("<div" + (jade.attrs({ 'data-state':(state) }, {"data-state":true})) + ">");
+buf.push("<div" + (jade.attrs({ 'data-state':(state.name) }, {"data-state":true})) + ">");
 if ( typeof stateMarker != 'undefined')
 {
 buf.push("<div" + (jade.attrs({ "class": (stateMarker) }, {"class":true})) + "></div>");
+}
+if ( state.label)
+{
+buf.push("<div class=\"state-label\">" + (jade.escape(null == (jade.interp = state.label) ? "" : jade.interp)) + "</div>");
 }
 buf.push("</div>");
       }

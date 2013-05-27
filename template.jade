@@ -6,6 +6,8 @@
       .toggle-progress-empty= emptyText || ''
   .toggle-states
     each state in states
-      div(data-state=state)
+      div(data-state=state.name)
         if typeof stateMarker != 'undefined'
           div(class=stateMarker)
+        if state.label
+          div.state-label= state.label

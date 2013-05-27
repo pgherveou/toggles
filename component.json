@@ -15,7 +15,8 @@
     "component/query": "*",
     "component/translate": "*",
     "pgherveou/transitionend": "*",
-    "visionmedia/jade": "*"
+    "visionmedia/jade": "*",
+    "pgherveou/toggles": "*"
   },
   "optional": {
     "visionmedia/jade": "*"

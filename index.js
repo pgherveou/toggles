@@ -71,6 +71,7 @@ function Toggles(el) {
   this.el = el;
   this.$el = classes(el);
   this.handle = query('.toggle-handle', el);
+
   this.stateNodes = query.all('[data-state]', el);
   this.progress = query('.toggle-progress', el);
 
@@ -220,8 +221,12 @@ Toggles.prototype.easeTo = function(index) {
     , state = this.el.dataset.state
     , next;
 
-  this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
-  this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+  if (this.progress)
+    this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+
+  if (this.handle)
+    this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+
   this.update(index);
 
   next = function() {
@@ -262,8 +267,8 @@ Toggles.prototype.moveToIndex = function(index) {
 
 Toggles.prototype.move = function(x) {
   if (this.x === x) return false;
-  translate(this.progress, (-this.toggleWidth + x + this.handleWidth/2), 0, 0);
-  translate(this.handle, x, 0, 0);
+  if (this.progress) translate(this.progress, (-this.toggleWidth + x + this.handleWidth/2), 0, 0);
+  if (this.handle)   translate(this.handle, x, 0, 0);
   this.x = x;
   return true;
 };

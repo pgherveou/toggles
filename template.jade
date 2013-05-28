@@ -8,6 +8,6 @@
     each state in states
       div(data-state=state.name)
         if typeof stateMarker != 'undefined'
-          div(class=stateMarker)
+          div(class=stateMarker)= state.text
         if state.label
           div.state-label= state.label

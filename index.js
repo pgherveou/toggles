@@ -208,6 +208,7 @@ Toggles.prototype.dragEnd = function(e) {
     index = Math.ceil((offsetDistance + this.handleWidth / 2 - this.stepLength / 2) / this.stepLength);
   }
 
+  this.emit('dragend', {index: index});
   this.easeTo(index);
 };
 

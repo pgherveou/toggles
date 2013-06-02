@@ -167,17 +167,20 @@ Toggles.prototype.dragMove = function(e) {
 
   prevent(e);
   this.distanceX = pageX(e) - this.dragStartX;
-  var offsetDistance = this.distanceX + this.offset;
+
+  var offsetDistance = this.distanceX + this.offset
+    , index = Math.ceil((this.states.length -1) * (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
 
   if (offsetDistance < 0) {
     this.move(0);
+    this.emit('dragging', {index: index, percent: 0});
   } else if (offsetDistance > this.max) {
     this.move(this.max);
+    this.emit('dragging', {index: index, percent: 100});
   } else {
     this.move(offsetDistance);
+    this.emit('dragging', {index: index, percent: 100* offsetDistance/this.max});
   }
-
-  var index = Math.ceil((this.states.length -1)* (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
   this.update(index);
 };
 

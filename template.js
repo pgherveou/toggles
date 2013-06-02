@@ -15,7 +15,7 @@ buf.push("<div" + (jade.attrs({ 'data-state':(state), "class": ('toggle') + ' ' 
 buf.push("<div" + (jade.attrs({ 'data-state':(state.name) }, {"data-state":true})) + ">");
 if ( typeof stateMarker != 'undefined')
 {
-buf.push("<div" + (jade.attrs({ "class": (stateMarker) }, {"class":true})) + "></div>");
+buf.push("<div" + (jade.attrs({ "class": (stateMarker) }, {"class":true})) + ">" + (jade.escape(null == (jade.interp = state.text) ? "" : jade.interp)) + "</div>");
 }
 if ( state.label)
 {
@@ -32,7 +32,7 @@ buf.push("</div>");
 buf.push("<div" + (jade.attrs({ 'data-state':(state.name) }, {"data-state":true})) + ">");
 if ( typeof stateMarker != 'undefined')
 {
-buf.push("<div" + (jade.attrs({ "class": (stateMarker) }, {"class":true})) + "></div>");
+buf.push("<div" + (jade.attrs({ "class": (stateMarker) }, {"class":true})) + ">" + (jade.escape(null == (jade.interp = state.text) ? "" : jade.interp)) + "</div>");
 }
 if ( state.label)
 {

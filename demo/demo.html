@@ -70,6 +70,10 @@
         log.value = "toggle-4: " + JSON.stringify(state) + '\n' + log.value
       });
 
+      tog4.on('dragging', function (state) {
+        console.log(state);
+      });
+
       tog2.on('toggle', function (state) {
         log.value = "toggle-2: " + JSON.stringify(state) + '\n' + log.value
       });

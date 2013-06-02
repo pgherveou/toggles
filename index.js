@@ -179,7 +179,7 @@ Toggles.prototype.dragMove = function(e) {
     this.emit('dragging', {index: index, percent: 100});
   } else {
     this.move(offsetDistance);
-    this.emit('dragging', {index: index, percent: 100* offsetDistance/this.max});
+    this.emit('dragging', {index: index, percent: offsetDistance/this.max});
   }
   this.update(index);
 };

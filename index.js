@@ -152,6 +152,7 @@ Toggles.prototype.dragStart = function(e) {
 
   this.el.style[transition] = '';
   this.$el.add('toggles-dragging');
+  this.emit('dragstart');
 };
 
 /**

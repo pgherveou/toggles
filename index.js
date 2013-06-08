@@ -66,7 +66,7 @@ Toggles.template = function(locals) {
  * @api public
  */
 
-function Toggles(el) {
+function Toggles(el, opts) {
   var self = this;
   this.el = el;
   this.$el = classes(el);
@@ -75,11 +75,25 @@ function Toggles(el) {
   this.stateNodes = query.all('[data-state]', el);
   this.progress = query('.toggle-progress', el);
 
-  // hard coded options TODO change this
-  this.opts = {
+  // defaults
+  defaults = {
     transitionSpeed: 0.3,
-    easing: 'ease'
+    easing: 'ease',
+    align: 'inside'
   };
+
+  // set opts
+  if (!opts) {
+    this.opts = defaults;
+  } else {
+    this.opts = {};
+    for (var opt in defaults) {
+      if (opts[opt] !== undefined)
+        this.opts[opt] = opts[opt];
+      else
+        this.opts[opt] = defaults[opt];
+    }
+  }
 
   // bind methods to instances
   this.dragStart = bind(this, this.dragStart);
@@ -95,9 +109,11 @@ function Toggles(el) {
   });
 
   // bind events
-  Events.bind(this.handle, evs.start, this.dragStart);
-  Events.bind(document.body, evs.move, this.dragMove);
-  Events.bind(document.body, evs.end,  this.dragEnd);
+  if (this.handle) {
+    Events.bind(this.handle, evs.start, this.dragStart);
+    Events.bind(document.body, evs.move, this.dragMove);
+    Events.bind(document.body, evs.end,  this.dragEnd);
+  }
 
   this.init();
   this.setState(this.el.dataset.state);
@@ -116,8 +132,16 @@ Emitter(Toggles.prototype);
 Toggles.prototype.init = function() {
   this.toggleWidth = this.el.offsetWidth;
   this.handleWidth = this.handle.offsetWidth;
-  this.max = this.toggleWidth - this.handleWidth;
   this.stepLength = this.toggleWidth / (this.states.length - 1);
+
+  if (this.opts.align === 'inside') {
+    this.max = this.toggleWidth - this.handleWidth;
+    this.min = 0;
+  } else {
+    this.max = this.toggleWidth + this.handleWidth / 2;
+    this.min = -this.handleWidth / 2;
+  }
+
 };
 
 /**
@@ -173,7 +197,7 @@ Toggles.prototype.dragMove = function(e) {
     , index = Math.ceil((this.states.length -1) * (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
 
   if (offsetDistance < 0) {
-    this.move(0);
+    this.move(this.min);
     this.emit('dragging', {index: index, percent: 0});
   } else if (offsetDistance > this.max) {
     this.move(this.max);
@@ -260,7 +284,7 @@ Toggles.prototype.easeTo = function(index) {
 
 Toggles.prototype.moveToIndex = function(index) {
   var length = this.states.length
-    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
+    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : this.min);
   return this.move(x);
 };
 

@@ -312,6 +312,7 @@ Toggles.prototype.setState = function(state) {
   var index = this.states.indexOf(state);
   this.moveToIndex(index);
   this.update(index);
+  this.emit('toggle', {index: index, state: state});
 };
 
 /**

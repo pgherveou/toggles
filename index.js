@@ -196,7 +196,7 @@ Toggles.prototype.dragMove = function(e) {
   var offsetDistance = this.distanceX + this.offset
     , index = Math.ceil((this.states.length -1) * (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
 
-  if (offsetDistance < 0) {
+  if (offsetDistance < this.min) {
     this.move(this.min);
     this.emit('dragging', {index: index, percent: 0});
   } else if (offsetDistance > this.max) {

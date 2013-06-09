@@ -304,15 +304,23 @@ Toggles.prototype.move = function(x) {
 
 /**
  * set state
+ * @param  {Boolean} animate
  *
  * @api public
  */
 
-Toggles.prototype.setState = function(state) {
+Toggles.prototype.setState = function(state, animate) {
   var index = this.states.indexOf(state);
-  this.moveToIndex(index);
-  this.update(index);
-  this.emit('toggle', {index: index, state: state});
+  if (animate) {
+    this.easeTo(index);
+  } else {
+    this.moveToIndex(index);
+    this.update(index);
+    if (this.el.dataset.state !== state) {
+      this.el.dataset.state = state;
+      this.emit('toggle', {index: index, state: state});
+    }
+  }
 };
 
 /**

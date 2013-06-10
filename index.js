@@ -66,34 +66,19 @@ Toggles.template = function(locals) {
  * @api public
  */
 
-function Toggles(el, opts) {
+function Toggles(el) {
   var self = this;
   this.el = el;
   this.$el = classes(el);
   this.handle = query('.toggle-handle', el);
-
   this.stateNodes = query.all('[data-state]', el);
   this.progress = query('.toggle-progress', el);
 
-  // defaults
-  defaults = {
+  // hard coded options TODO change this
+  this.opts = {
     transitionSpeed: 0.3,
-    easing: 'ease',
-    align: 'inside'
+    easing: 'ease'
   };
-
-  // set opts
-  if (!opts) {
-    this.opts = defaults;
-  } else {
-    this.opts = {};
-    for (var opt in defaults) {
-      if (opts[opt] !== undefined)
-        this.opts[opt] = opts[opt];
-      else
-        this.opts[opt] = defaults[opt];
-    }
-  }
 
   // bind methods to instances
   this.dragStart = bind(this, this.dragStart);
@@ -131,17 +116,9 @@ Emitter(Toggles.prototype);
 
 Toggles.prototype.init = function() {
   this.toggleWidth = this.el.offsetWidth;
-  this.handleWidth = this.handle.offsetWidth;
+  this.handleWidth = this.handle.offsetWidth - 2;
+  this.max = this.toggleWidth - this.handleWidth;
   this.stepLength = this.toggleWidth / (this.states.length - 1);
-
-  if (this.opts.align === 'inside') {
-    this.max = this.toggleWidth - this.handleWidth;
-    this.min = 0;
-  } else {
-    this.max = this.toggleWidth + this.handleWidth / 2;
-    this.min = -this.handleWidth / 2;
-  }
-
 };
 
 /**
@@ -176,7 +153,6 @@ Toggles.prototype.dragStart = function(e) {
 
   this.el.style[transition] = '';
   this.$el.add('toggles-dragging');
-  this.emit('dragstart');
 };
 
 /**
@@ -192,20 +168,17 @@ Toggles.prototype.dragMove = function(e) {
 
   prevent(e);
   this.distanceX = pageX(e) - this.dragStartX;
+  var offsetDistance = this.distanceX + this.offset;
 
-  var offsetDistance = this.distanceX + this.offset
-    , index = Math.ceil((this.states.length -1) * (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
-
-  if (offsetDistance < this.min) {
-    this.move(this.min);
-    this.emit('dragging', {index: index, percent: 0});
+  if (offsetDistance < 0) {
+    this.move(0);
   } else if (offsetDistance > this.max) {
     this.move(this.max);
-    this.emit('dragging', {index: index, percent: 100});
   } else {
     this.move(offsetDistance);
-    this.emit('dragging', {index: index, percent: offsetDistance/this.max});
   }
+
+  var index = Math.ceil((this.states.length -1)* (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
   this.update(index);
 };
 
@@ -233,7 +206,6 @@ Toggles.prototype.dragEnd = function(e) {
     index = Math.ceil((offsetDistance + this.handleWidth / 2 - this.stepLength / 2) / this.stepLength);
   }
 
-  this.emit('dragend', {index: index});
   this.easeTo(index);
 };
 
@@ -261,7 +233,7 @@ Toggles.prototype.easeTo = function(index) {
   next = function() {
     var newState = self.states[index];
     if (self.progress) self.progress.style[transition] = '';
-    if (self.handle)   self.handle.style[transition] = '';
+    if (self.handle) self.handle.style[transition] = '';
     self.$el.remove('toggles-animating');
     if (newState !== state) {
       self.el.dataset.state = newState;
@@ -269,11 +241,13 @@ Toggles.prototype.easeTo = function(index) {
     }
   };
 
-  if (this.moveToIndex(index)) {
+  if (this.handle && this.moveToIndex(index)) {
     this.$el.add('toggles-animating');
     Events.once(this.handle, transitionend, next);
-  } else
+  } else {
     next();
+  }
+
 };
 
 /**
@@ -284,7 +258,7 @@ Toggles.prototype.easeTo = function(index) {
 
 Toggles.prototype.moveToIndex = function(index) {
   var length = this.states.length
-    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : this.min);
+    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : 0);
   return this.move(x);
 };
 
@@ -296,31 +270,22 @@ Toggles.prototype.moveToIndex = function(index) {
 
 Toggles.prototype.move = function(x) {
   if (this.x === x) return false;
-  if (this.progress) translate(this.progress, (-this.toggleWidth + x + this.handleWidth/2), 0, 0);
-  if (this.handle)   translate(this.handle, x, 0, 0);
+  translate(this.progress, (-this.toggleWidth + x + this.handleWidth/2), 0, 0);
+  translate(this.handle, x, 0, 0);
   this.x = x;
   return true;
 };
 
 /**
  * set state
- * @param  {Boolean} animate
  *
  * @api public
  */
 
-Toggles.prototype.setState = function(state, animate) {
+Toggles.prototype.setState = function(state) {
   var index = this.states.indexOf(state);
-  if (animate) {
-    this.easeTo(index);
-  } else {
-    this.moveToIndex(index);
-    this.update(index);
-    if (this.el.dataset.state !== state) {
-      this.el.dataset.state = state;
-      this.emit('toggle', {index: index, state: state});
-    }
-  }
+  this.moveToIndex(index);
+  this.update(index);
 };
 
 /**

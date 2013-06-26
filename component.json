@@ -6,10 +6,10 @@
   "keywords": [],
   "dependencies": {
     "component/bind": "*",
+    "component/each": "*",
     "component/classes": "*",
     "component/emitter": "*",
     "pgherveou/event": "*",
-    "component/map": "*",
     "pgherveou/prefix": "*",
     "yields/prevent": "*",
     "component/query": "*",

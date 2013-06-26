@@ -6,7 +6,7 @@ var bind  = require('bind')
   , classes = require('classes')
   , Emitter = require('emitter')
   , Events  = require('event')
-  , map = require('map')
+  , each  = require('each')
   , prefix = require('prefix')
   , prevent = require('prevent')
   , query = require('query')
@@ -100,13 +100,21 @@ function Toggles(el, opts) {
   this.dragMove = bind(this, this.dragMove);
   this.dragEnd = bind(this, this.dragEnd);
 
-  this.states = map(this.stateNodes, function(el, i) {
-    Events.bind(el, 'click', function() {
+
+  this.states = [];
+  this.statesFn = [];
+
+  each(this.stateNodes, function (stateEl, i) {
+    var fn = function () {
       self.init();
       self.easeTo(i);
-    });
-    return el.dataset.state;
+    };
+
+    Events.bind(stateEl, 'click', fn);
+    self.states.push(stateEl.dataset.state);
+    self.statesFn.push(fn);
   });
+
 
   // bind events
   if (this.handle) {
@@ -150,15 +158,21 @@ Toggles.prototype.init = function() {
  */
 
 Toggles.prototype.destroy = function() {
-  map(this.stateNodes, function(el, i) {
-    Events.unbind(el, 'click');
-  });
+  var self = this;
 
   if (this.handle) {
     Events.unbind(this.handle, evs.start, this.dragStart);
     Events.unbind(document.body, evs.move, this.dragMove);
     Events.unbind(document.body, evs.end,  this.dragEnd);
   }
+
+  if (this.stateNodes) {
+    each(this.stateNodes, function (stateEl, i) {
+      Events.unbind(stateEl, 'click', self.statesFn[i]);
+    });
+  }
+
+  this.el = this.$el = this.stateNodes = this.statesFn = this.progress = this.handle = null;
 };
 
 /**

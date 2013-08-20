@@ -96,6 +96,7 @@ function Toggles(el, opts) {
   }
 
   // bind methods to instances
+  this.handleClick = bind(this, this.handleClick);
   this.dragStart = bind(this, this.dragStart);
   this.dragMove = bind(this, this.dragMove);
   this.dragEnd = bind(this, this.dragEnd);
@@ -118,6 +119,7 @@ function Toggles(el, opts) {
 
   // bind events
   if (this.handle) {
+    Events.bind(this.handle, 'click', this.handleClick);
     Events.bind(this.handle, evs.start, this.dragStart);
     Events.bind(document.body, evs.move, this.dragMove);
     Events.bind(document.body, evs.end,  this.dragEnd);
@@ -353,6 +355,20 @@ Toggles.prototype.update = function(index) {
   Array.prototype.slice.call(this.stateNodes, index + 1).forEach(function(el) {
     classes(el).remove('active');
   });
+};
+
+
+/**
+ * handle click event on the handle
+ *
+ * @apirivate
+ */
+
+Toggles.prototype.handleClick = function() {
+  var state = this.el.dataset.state
+    , index = this.states.indexOf(state)
+    , next  = this.states[(index + 1) % this.states.length];
+  this.setState(next, true);
 };
 
 /**

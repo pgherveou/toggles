@@ -2,7 +2,7 @@
   "name": "toggles",
   "repo": "pgherveou/toggles",
   "description": "on/off or multistate toggles",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [],
   "dependencies": {
     "component/bind": "*",
@@ -15,7 +15,8 @@
     "component/query": "*",
     "component/translate": "*",
     "pgherveou/transitionend": "*",
-    "visionmedia/jade": "*"
+    "visionmedia/jade": "*",
+    "ftlabs/fastclick": "*"
   },
   "optional": {
     "visionmedia/jade": "*"

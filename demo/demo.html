@@ -58,7 +58,7 @@
 
 
       tog4.on('toggle', function (state) {
-        log.value = "toggle-4: " + JSON.stringify(state) + '\n' + log.value
+        log.value = "toggle 4: " + JSON.stringify(state) + '\n' + log.value
       });
 
       tog4.on('dragging', function (state) {
@@ -66,7 +66,15 @@
       });
 
       tog2.on('toggle', function (state) {
-        log.value = "toggle-2: " + JSON.stringify(state) + '\n' + log.value
+        log.value = "toggle 2: " + JSON.stringify(state) + '\n' + log.value
+      });
+
+      tog2.on('toggle', function (state) {
+        log.value = "toggle 2: " + JSON.stringify(state) + '\n' + log.value
+      });
+
+      tog2.on('click', function (state) {
+        log.value = "click 2: "
       });
 
     </script>

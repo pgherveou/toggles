@@ -96,11 +96,9 @@ function Toggles(el, opts) {
   }
 
   // bind methods to instances
-  this.handleClick = bind(this, this.handleClick);
   this.dragStart = bind(this, this.dragStart);
   this.dragMove = bind(this, this.dragMove);
   this.dragEnd = bind(this, this.dragEnd);
-
 
   this.states = [];
   this.statesFn = [];
@@ -119,7 +117,6 @@ function Toggles(el, opts) {
 
   // bind events
   if (this.handle) {
-    Events.bind(this.handle, 'click', this.handleClick);
     Events.bind(this.handle, evs.start, this.dragStart);
     Events.bind(document.body, evs.move, this.dragMove);
     Events.bind(document.body, evs.end,  this.dragEnd);
@@ -236,6 +233,7 @@ Toggles.prototype.dragMove = function(e) {
 
 Toggles.prototype.dragEnd = function(e) {
   if (!this.isDragging) return;
+
   this.isDragging = false;
   this.$el.remove('toggles-dragging');
 
@@ -243,8 +241,9 @@ Toggles.prototype.dragEnd = function(e) {
     , offsetDistance = this.distanceX + this.offset
     , index;
 
-
-  if (offsetDistance < this.stepLength / 2 - this.handleWidth / 2) {
+  if (this.distanceX === 0) {
+    index = (this.states.indexOf(this.el.dataset.state) + 1) % this.states.length;
+  } else if (offsetDistance < this.stepLength / 2 - this.handleWidth / 2) {
     index = 0;
   } else if (offsetDistance > this.toggleWidth - this.stepLength / 2 - this.handleWidth / 2) {
     index = length - 1;
@@ -357,19 +356,6 @@ Toggles.prototype.update = function(index) {
   });
 };
 
-
-/**
- * handle click event on the handle
- *
- * @apirivate
- */
-
-Toggles.prototype.handleClick = function() {
-  var state = this.el.dataset.state
-    , index = this.states.indexOf(state)
-    , next  = this.states[(index + 1) % this.states.length];
-  this.setState(next, true);
-};
 
 /**
  * make toggles a zepto/jquery plugin

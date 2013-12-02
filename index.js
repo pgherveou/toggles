@@ -2,27 +2,26 @@
  * module dependencies
  */
 
-var bind  = require('bind')
-  , classes = require('classes')
-  , Emitter = require('emitter')
-  , Events  = require('event')
-  , each  = require('each')
-  , prefix = require('prefix')
-  , prevent = require('prevent')
-  , query = require('query')
-  , translate = require('translate')
-  , transitionend = require('transitionend');
+var classes = require('classes'),
+    emitter = require('emitter'),
+    Events  = require('event'),
+    delegate = require('delegate'),
+    prefix = require('prefix'),
+    query = require('query'),
+    translate = require('translate'),
+    transitionend = require('transitionend');
 
 // module globals
 
-var hasTouch = 'ontouchstart' in window
-  , transition = prefix('transition')
-  , transform = prefix('transform')
-  , evs = {
-    start: hasTouch ? 'touchstart' : 'mousedown',
-    move: hasTouch ? 'touchmove' : 'mousemove',
-    end: hasTouch ? 'touchend' : 'mouseup'
-  };
+var hasTouch = 'ontouchstart' in window,
+    transition = prefix('transition'),
+    evs;
+
+evs = {
+  start: hasTouch ? 'touchstart' : 'mousedown',
+  move: hasTouch ? 'touchmove' : 'mousemove',
+  end: hasTouch ? 'touchend' : 'mouseup'
+};
 
 /**
  * helper function
@@ -34,28 +33,16 @@ var hasTouch = 'ontouchstart' in window
  */
 
 var pageX = function page(e){
-  return (hasTouch && e.touches.length && e.touches[0]) ? e.touches[0].pageX : e.pageX;
+  return (hasTouch && e.touches.length && e.touches[0])
+    ? e.touches[0].pageX
+    : e.pageX;
 };
 
-/**
- * Expose Toggles
- */
-
-module.exports = Toggles;
-
-/**
- * Static template generator
- * TODO make it a plain string template
- */
-
-Toggles.template = function(locals) {
-  if (!locals) locals = {};
-  if (!locals.state) locals.state = locals.states[0];
-  if (!locals.className) locals.className = '';
-  if (!locals.handleClass) locals.handleClass = '';
-  if (!locals.fillText) locals.fillText = '';
-  if (!locals.emptyText) locals.emptyText = '';
-  return require('./template')(locals);
+// defaults
+var defaults = {
+  transitionSpeed: 0.3,
+  round: true,
+  easing: 'ease'
 };
 
 /**
@@ -67,20 +54,14 @@ Toggles.template = function(locals) {
  */
 
 function Toggles(el, opts) {
-  var self = this;
   this.el = el;
   this.$el = classes(el);
+  this.drag = {};
   this.handle = query('.toggle-handle', el);
-
-  this.stateNodes = query.all('[data-state]', el);
   this.progress = query('.toggle-progress', el);
-
-  // defaults
-  defaults = {
-    transitionSpeed: 0.3,
-    easing: 'ease',
-    align: 'inside'
-  };
+  this.states = [].map.call(query.all('[data-state]', el), function (node) {
+    return node.dataset.state;
+  });
 
   // set opts
   if (!opts) {
@@ -88,67 +69,57 @@ function Toggles(el, opts) {
   } else {
     this.opts = {};
     for (var opt in defaults) {
-      if (opts[opt] !== undefined)
-        this.opts[opt] = opts[opt];
-      else
-        this.opts[opt] = defaults[opt];
+      this.opts[opt] = opts[opt] ? opts[opt] : defaults[opt];
     }
   }
 
-  // bind methods to instances
-  this.dragStart = bind(this, this.dragStart);
-  this.dragMove = bind(this, this.dragMove);
-  this.dragEnd = bind(this, this.dragEnd);
-
-  this.states = [];
-  this.statesFn = [];
-
-  each(this.stateNodes, function (stateEl, i) {
-    var fn = function () {
-      self.init();
-      self.easeTo(i);
-    };
-
-    Events.bind(stateEl, 'click', fn);
-    self.states.push(stateEl.dataset.state);
-    self.statesFn.push(fn);
-  });
-
+  // bind instance methods
+  this.clickState = this.clickState.bind(this);
+  this.dragStart = this.dragStart.bind(this);
+  this.dragMove = this.dragMove.bind(this);
+  this.dragEnd = this.dragEnd.bind(this);
 
   // bind events
-  if (this.handle) {
-    Events.bind(this.handle, evs.start, this.dragStart);
-    Events.bind(document.body, evs.move, this.dragMove);
-    Events.bind(document.body, evs.end,  this.dragEnd);
-  }
+  delegate.bind(el, '.toggle-states [data-state]', 'click',  this.clickState);
+  Events.bind(this.handle, evs.start, this.dragStart);
+  Events.bind(document.body, evs.move, this.dragMove);
+  Events.bind(document.body, evs.end,  this.dragEnd);
 
+  // init dimensions
   this.init();
-  this.setState(this.el.dataset.state);
+
+  // set initial index
+  this.setState(this.el.dataset.state || this.states[0], {
+    move: true,
+    animate: false
+  });
 }
+
+/*!
+ * Expose Toggles
+ */
+
+module.exports = Toggles;
+
 
 /**
  * Mixin emitter
  */
 
-Emitter(Toggles.prototype);
+emitter(Toggles.prototype);
 
 /**
  * init dimensions values
  */
 
 Toggles.prototype.init = function() {
-  if (!this.handle) return;
-  this.toggleWidth = this.el.offsetWidth;
   this.handleWidth = this.handle.offsetWidth;
-  this.stepLength = this.toggleWidth / (this.states.length - 1);
 
-  if (this.opts.align === 'inside') {
-    this.max = this.toggleWidth - this.handleWidth;
-    this.min = 0;
-  } else {
-    this.max = this.toggleWidth + this.handleWidth / 2;
-    this.min = -this.handleWidth / 2;
-  }
+  //     (*)--------(*)--------(*)
+  // [ state 1 ][ state 2 ][ state 3 ]
+  this.stepLength = this.el.offsetWidth / this.states.length;
+  this.toggleWidth = this.el.offsetWidth - this.stepLength;
+  this.handle.style.left = (this.stepLength - this.handleWidth) / 2 + 'px';
 
 };
 
@@ -157,21 +128,21 @@ Toggles.prototype.init = function() {
  */
 
 Toggles.prototype.destroy = function() {
-  var self = this;
+  Events.unbind(this.handle, evs.start, this.dragStart);
+  Events.unbind(document.body, evs.move, this.dragMove);
+  Events.unbind(document.body, evs.end,  this.dragEnd);
+  delegate.unbind(this.el, '.toggle-states [data-state]', 'click',
+    this.clickState);
 
-  if (this.handle) {
-    Events.unbind(this.handle, evs.start, this.dragStart);
-    Events.unbind(document.body, evs.move, this.dragMove);
-    Events.unbind(document.body, evs.end,  this.dragEnd);
-  }
+  this.$el = this.el = this.progress = this.handle = null;
+};
 
-  if (this.stateNodes) {
-    each(this.stateNodes, function (stateEl, i) {
-      Events.unbind(stateEl, 'click', self.statesFn[i]);
-    });
-  }
+/**
+ * handle click on state
+ */
 
-  this.el = this.$el = this.stateNodes = this.statesFn = this.progress = this.handle = null;
+Toggles.prototype.clickState = function (e) {
+  this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});
 };
 
 /**
@@ -181,18 +152,17 @@ Toggles.prototype.destroy = function() {
  */
 
 Toggles.prototype.dragStart = function(e) {
-  var length = this.states.length
-    , index = this.states.indexOf(this.el.dataset.state);
 
-  this.init();
-  this.isDragging = true;
-  this.distanceX = 0;
-  this.dragStartX = pageX(e);
-  this.offset = index ? index/(length -1) * this.toggleWidth - this.handleWidth / 2 : 0;
+  // save drag state
+  this.drag = {
+    index: this.index,
+    offset: this.x,
+    dragging: true,
+    pageX: pageX(e)
+  };
 
-  this.el.style[transition] = '';
+  // add class
   this.$el.add('toggles-dragging');
-  this.emit('dragstart');
 };
 
 /**
@@ -202,27 +172,25 @@ Toggles.prototype.dragStart = function(e) {
  */
 
 Toggles.prototype.dragMove = function(e) {
-  if (!this.isDragging) return;
-  e = e.originalEvent || e;
-  if (hasTouch && e.touches.length && e.touches.length > 1) return; // Exit if a pinch
+  if (!this.drag.dragging) return;
+  if (hasTouch && e.touches.length && e.touches.length > 1) return;
 
-  prevent(e);
-  this.distanceX = pageX(e) - this.dragStartX;
+  var distance = pageX(e) - this.drag.pageX + this.drag.offset,
+      newIndex = Math.round(distance / this.stepLength);
 
-  var offsetDistance = this.distanceX + this.offset
-    , index = Math.ceil((this.states.length -1) * (offsetDistance + this.handleWidth / 2) / this.toggleWidth);
-
-  if (offsetDistance < this.min) {
-    this.move(this.min);
-    this.emit('dragging', {index: index, percent: 0});
-  } else if (offsetDistance > this.max) {
-    this.move(this.max);
-    this.emit('dragging', {index: index, percent: 100});
+  if (distance > this.toggleWidth) {
+    distance = this.toggleWidth;
+    newIndex = this.states.length - 1;
+  } else if (distance < 0) {
+    distance = 0;
+    newIndex = 0;
   } else {
-    this.move(offsetDistance);
-    this.emit('dragging', {index: index, percent: offsetDistance/this.max});
+    newIndex = Math.round(distance / this.stepLength);
   }
-  this.update(index);
+
+  this.move(distance);
+  this.setIndex(newIndex, {animate: false, move: false});
+  return false;
 };
 
 /**
@@ -232,141 +200,113 @@ Toggles.prototype.dragMove = function(e) {
  */
 
 Toggles.prototype.dragEnd = function(e) {
-  if (!this.isDragging) return;
+  if (!this.drag.dragging) return;
 
-  this.isDragging = false;
-  this.$el.remove('toggles-dragging');
-
-  var length = this.states.length
-    , offsetDistance = this.distanceX + this.offset
-    , index;
-
-  if (this.distanceX === 0) {
-    index = (this.states.indexOf(this.el.dataset.state) + 1) % this.states.length;
-  } else if (offsetDistance < this.stepLength / 2 - this.handleWidth / 2) {
-    index = 0;
-  } else if (offsetDistance > this.toggleWidth - this.stepLength / 2 - this.handleWidth / 2) {
-    index = length - 1;
-  } else {
-    index = Math.ceil((offsetDistance + this.handleWidth / 2 - this.stepLength / 2) / this.stepLength);
+  if (!this.opts.round) {
+    return this.setIndex(this.state, {animate: true, move: true});
   }
 
-  this.emit('dragend', {index: index});
-  this.easeTo(index);
+  var distance = pageX(e) - this.drag.pageX + this.drag.offset,
+      newIndex = Math.round(distance / this.stepLength);
+
+  if (newIndex < 0) {
+    this.setIndex(0, {animate: true, move: true});
+  } else if (newIndex > this.states.length - 1) {
+    this.setIndex(this.states.length - 1, {animate: true, move: true});
+  } else {
+    this.setIndex(newIndex, {animate: true, move: true});
+  }
+
+  this.drag.dragging = false;
+  this.$el.remove('toggles-dragging');
+  return false;
 };
 
 /**
- * animate animation
- * @param  {Number} index
+ * set state
+ * @param  {Object} opts
  *
- * @api private
+ * @api public
  */
 
-Toggles.prototype.easeTo = function(index) {
-  var self = this
-    , length = this.states.length
-    , state = this.el.dataset.state
-    , next;
-
-  if (this.progress)
-    this.progress.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
-
-  if (this.handle)
-    this.handle.style[transition] = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
-
-  this.update(index);
-
-  next = function() {
-    var newState = self.states[index];
-    if (self.progress) self.progress.style[transition] = '';
-    if (self.handle)   self.handle.style[transition] = '';
-    self.$el.remove('toggles-animating');
-    if (newState !== state) {
-      self.el.dataset.state = newState;
-      self.emit('toggle', {index: index, state: newState});
-    }
-  };
-
-  if (this.handle && this.moveToIndex(index)) {
-    this.$el.add('toggles-animating');
-    Events.once(this.handle, transitionend, next);
-  } else
-    next();
+Toggles.prototype.setState = function (state, opts) {
+  this.setIndex(this.states.indexOf(state), opts);
 };
+
+/**
+ * set index
+ * @param  {Object} opts
+ *
+ * @api public
+ */
+
+Toggles.prototype.setIndex = function(index, opts) {
+  var oldIndex = this.index;
+
+  if (oldIndex !== index) {
+    this.index = index;
+    this.state = this.states[index];
+    this.el.dataset.state = this.state;
+  }
+
+  var _this = this,
+    style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+
+  if (opts.animate && this.progress) this.progress.style[transition] = style;
+  if (opts.animate && this.handle) this.handle.style[transition] = style;
+
+  function done() {
+
+    // unbind
+    Events.unbind(_this.handle, transitionend, done);
+
+    // reset style
+    _this.handle.style[transition] = '';
+    if (_this.progress) _this.progress.style[transition] = '';
+
+    // remove classe
+    _this.$el.remove('toggles-animating');
+    if (!opts.silent && (oldIndex !== index)) {
+      _this.emit('toggle', {state: _this.state});
+    }
+  }
+
+
+  if (opts.move && this.moveToIndex(index) && opts.animate) {
+    this.$el.add('toggles-animating');
+    Events.bind(this.handle, transitionend, done);
+  } else {
+    done();
+  }
+};
+
 
 /**
  * move handle to index
  *
+ * @return {Boolean} true if x position has changed
  * @api private
  */
 
 Toggles.prototype.moveToIndex = function(index) {
-  var length = this.states.length
-    , x = Math.min(this.max, index ? index/(length -1) * this.toggleWidth - this.handleWidth/2 : this.min);
-  return this.move(x);
+  return this.move(index * this.stepLength);
 };
 
 /**
  * move handle and progress
  *
+ * @return {Boolean} true if x position has changed
  * @api private
  */
 
 Toggles.prototype.move = function(x) {
   if (this.x === x) return false;
-  if (this.progress) translate(this.progress, (-this.toggleWidth + x + this.handleWidth/2), 0, 0);
-  if (this.handle)   translate(this.handle, x, 0, 0);
   this.x = x;
+
+
+  if (this.progress) translate(this.progress, x, 0, 0);
+  translate(this.handle, x, 0, 0);
   return true;
 };
 
-/**
- * set state
- * @param  {Boolean} animate
- *
- * @api public
- */
 
-Toggles.prototype.setState = function(state, animate) {
-  var index = this.states.indexOf(state);
-  if (animate) {
-    this.easeTo(index);
-  } else {
-    this.moveToIndex(index);
-    this.update(index);
-    if (this.el.dataset.state !== state) {
-      this.el.dataset.state = state;
-      this.emit('toggle', {index: index, state: state});
-    }
-  }
-};
-
-/**
- * add an active class on currently active state nodes
- *
- * @api private
- */
-
-Toggles.prototype.update = function(index) {
-  Array.prototype.slice.call(this.stateNodes, 0, index).forEach(function(el) {
-    classes(el).add('active');
-  });
-  Array.prototype.slice.call(this.stateNodes, index + 1).forEach(function(el) {
-    classes(el).remove('active');
-  });
-};
-
-
-/**
- * make toggles a zepto/jquery plugin
- *
- * @api public
- */
-
-Toggles.plugin = function($) {
-  $.fn.toggles = function() {
-    this.each(function (el) {
-      new Toggles(el);
-    });
-  };
-};

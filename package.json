@@ -1,0 +1,35 @@
+{
+  "name": "toggles",
+  "version": "0.0.3",
+  "description": "multistate toggles",
+  "author": "PG Herveou",
+  "main": "build/toggles.js",
+
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/pgherveou/toggles"
+  },
+
+  "bugs": {
+    "url": "https://github.com/pgherveou/toggles/issues"
+  },
+
+  "keywords": [
+    "toggle",
+    "on/off",
+    "touch"
+  ],
+
+  "license": "MIT",
+
+  "homepage": "https://github.com/pgherveou/toggles",
+
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-shell": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-connect": "*",
+    "grunt-contrib-clean": "*"
+  }
+}

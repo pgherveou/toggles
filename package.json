@@ -1,6 +1,6 @@
 {
   "name": "toggles",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "multistate toggles",
   "author": "PG Herveou",
   "main": "build/toggles.js",

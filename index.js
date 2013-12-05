@@ -201,22 +201,7 @@ Toggles.prototype.dragMove = function(e) {
 
 Toggles.prototype.dragEnd = function(e) {
   if (!this.drag.dragging) return;
-
-  if (!this.opts.round) {
-    return this.setIndex(this.state, {animate: true, move: true});
-  }
-
-  var distance = pageX(e) - this.drag.pageX + this.drag.offset,
-      newIndex = Math.round(distance / this.stepLength);
-
-  if (newIndex < 0) {
-    this.setIndex(0, {animate: true, move: true});
-  } else if (newIndex > this.states.length - 1) {
-    this.setIndex(this.states.length - 1, {animate: true, move: true});
-  } else {
-    this.setIndex(newIndex, {animate: true, move: true});
-  }
-
+  this.setIndex(this.index, {animate: true, move: true});
   this.drag.dragging = false;
   this.$el.remove('toggles-dragging');
   return false;

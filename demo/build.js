@@ -379,12 +379,6 @@ ClassList.prototype.contains = function(name){\n\
 require.register("component-emitter/index.js", Function("exports, require, module",
 "\n\
 /**\n\
- * Module dependencies.\n\
- */\n\
-\n\
-var index = require('indexof');\n\
-\n\
-/**\n\
  * Expose `Emitter`.\n\
  */\n\
 \n\
@@ -424,7 +418,8 @@ function mixin(obj) {\n\
  * @api public\n\
  */\n\
 \n\
-Emitter.prototype.on = function(event, fn){\n\
+Emitter.prototype.on =\n\
+Emitter.prototype.addEventListener = function(event, fn){\n\
   this._callbacks = this._callbacks || {};\n\
   (this._callbacks[event] = this._callbacks[event] || [])\n\
     .push(fn);\n\
@@ -450,7 +445,7 @@ Emitter.prototype.once = function(event, fn){\n\
     fn.apply(this, arguments);\n\
   }\n\
 \n\
-  fn._off = on;\n\
+  on.fn = fn;\n\
   this.on(event, on);\n\
   return this;\n\
 };\n\
@@ -467,7 +462,8 @@ Emitter.prototype.once = function(event, fn){\n\
 \n\
 Emitter.prototype.off =\n\
 Emitter.prototype.removeListener =\n\
-Emitter.prototype.removeAllListeners = function(event, fn){\n\
+Emitter.prototype.removeAllListeners =\n\
+Emitter.prototype.removeEventListener = function(event, fn){\n\
   this._callbacks = this._callbacks || {};\n\
 \n\
   // all\n\
@@ -487,8 +483,14 @@ Emitter.prototype.removeAllListeners = function(event, fn){\n\
   }\n\
 \n\
   // remove specific handler\n\
-  var i = index(callbacks, fn._off || fn);\n\
-  if (~i) callbacks.splice(i, 1);\n\
+  var cb;\n\
+  for (var i = 0; i < callbacks.length; i++) {\n\
+    cb = callbacks[i];\n\
+    if (cb === fn || cb.fn === fn) {\n\
+      callbacks.splice(i, 1);\n\
+      break;\n\
+    }\n\
+  }\n\
   return this;\n\
 };\n\
 \n\
@@ -695,8 +697,7 @@ exports.unbind = function(el, type, fn, capture){\n\
 //@ sourceURL=component-delegate/index.js"
 ));
 require.register("component-query/index.js", Function("exports, require, module",
-"\n\
-function one(selector, el) {\n\
+"function one(selector, el) {\n\
   return el.querySelector(selector);\n\
 }\n\
 \n\
@@ -715,6 +716,7 @@ exports.engine = function(obj){\n\
   if (!obj.all) throw new Error('.all callback required');\n\
   one = obj.one;\n\
   exports.all = obj.all;\n\
+  return exports;\n\
 };\n\
 //@ sourceURL=component-query/index.js"
 ));
@@ -795,8 +797,8 @@ function translate(el, x, y){\n\
       el.style[transform] = 'translate(' + x + 'px,' + y + 'px)';\n\
     }\n\
   } else {\n\
-    el.style.left = x;\n\
-    el.style.top = y;\n\
+    el.style.left = x + 'px';\n\
+    el.style.top = y + 'px';\n\
   }\n\
 };\n\
 //@ sourceURL=component-translate/index.js"
@@ -880,7 +882,7 @@ require.register("ftlabs-fastclick/lib/fastclick.js", Function("exports, require
 "/**\n\
  * @preserve FastClick: polyfill to remove click delays on browsers with touch UIs.\n\
  *\n\
- * @version 0.6.9\n\
+ * @version 0.6.11\n\
  * @codingstandard ftlabs-jsv2\n\
  * @copyright The Financial Times Limited [All Rights Reserved]\n\
  * @license MIT License (see LICENSE.txt)\n\
@@ -1124,8 +1126,9 @@ FastClick.prototype.needsFocus = function(target) {\n\
 \t'use strict';\n\
 \tswitch (target.nodeName.toLowerCase()) {\n\
 \tcase 'textarea':\n\
-\tcase 'select':\n\
 \t\treturn true;\n\
+\tcase 'select':\n\
+\t\treturn !this.deviceIsAndroid;\n\
 \tcase 'input':\n\
 \t\tswitch (target.type) {\n\
 \t\tcase 'button':\n\
@@ -1164,9 +1167,20 @@ FastClick.prototype.sendClick = function(targetElement, event) {\n\
 \n\
 \t// Synthesise a click event, with an extra attribute so it can be tracked\n\
 \tclickEvent = document.createEvent('MouseEvents');\n\
-\tclickEvent.initMouseEvent('click', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);\n\
+\tclickEvent.initMouseEvent(this.determineEventType(targetElement), true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);\n\
 \tclickEvent.forwardedTouchEvent = true;\n\
 \ttargetElement.dispatchEvent(clickEvent);\n\
+};\n\
+\n\
+FastClick.prototype.determineEventType = function(targetElement) {\n\
+\t'use strict';\n\
+\n\
+\t//Issue #159: Android Chrome Select Box does not open with a synthetic click event\n\
+\tif (this.deviceIsAndroid && targetElement.tagName.toLowerCase() === 'select') {\n\
+\t\treturn 'mousedown';\n\
+\t}\n\
+\n\
+\treturn 'click';\n\
 };\n\
 \n\
 \n\
@@ -1177,7 +1191,8 @@ FastClick.prototype.focus = function(targetElement) {\n\
 \t'use strict';\n\
 \tvar length;\n\
 \n\
-\tif (this.deviceIsIOS && targetElement.setSelectionRange) {\n\
+\t// Issue #160: on iOS 7, some input elements (e.g. date datetime) throw a vague TypeError on setSelectionRange. These elements don't have an integer value for the selectionStart and selectionEnd properties, but unfortunately that can't be used for detection because accessing the properties also throws a TypeError. Just check the type instead. Filed as Apple bug #15122724.\n\
+\tif (this.deviceIsIOS && targetElement.setSelectionRange && targetElement.type.indexOf('date') !== 0 && targetElement.type !== 'time') {\n\
 \t\tlength = targetElement.value.length;\n\
 \t\ttargetElement.setSelectionRange(length, length);\n\
 \t} else {\n\
@@ -1386,6 +1401,9 @@ FastClick.prototype.onTouchEnd = function(event) {\n\
 \t\treturn true;\n\
 \t}\n\
 \n\
+\t// Reset to prevent wrong click cancel on input (issue #156).\n\
+\tthis.cancelNextClick = false;\n\
+\n\
 \tthis.lastClickTime = event.timeStamp;\n\
 \n\
 \ttrackingClickStart = this.trackingClickStart;\n\
@@ -1584,19 +1602,30 @@ FastClick.prototype.destroy = function() {\n\
 FastClick.notNeeded = function(layer) {\n\
 \t'use strict';\n\
 \tvar metaViewport;\n\
+\tvar chromeVersion;\n\
 \n\
 \t// Devices that don't support touch don't need FastClick\n\
 \tif (typeof window.ontouchstart === 'undefined') {\n\
 \t\treturn true;\n\
 \t}\n\
 \n\
-\tif ((/Chrome\\/[0-9]+/).test(navigator.userAgent)) {\n\
+\t// Chrome version - zero for other browsers\n\
+\tchromeVersion = +(/Chrome\\/([0-9]+)/.exec(navigator.userAgent) || [,0])[1];\n\
 \n\
-\t\t// Chrome on Android with user-scalable=\"no\" doesn't need FastClick (issue #89)\n\
+\tif (chromeVersion) {\n\
+\n\
 \t\tif (FastClick.prototype.deviceIsAndroid) {\n\
 \t\t\tmetaViewport = document.querySelector('meta[name=viewport]');\n\
-\t\t\tif (metaViewport && metaViewport.content.indexOf('user-scalable=no') !== -1) {\n\
-\t\t\t\treturn true;\n\
+\t\t\t\n\
+\t\t\tif (metaViewport) {\n\
+\t\t\t\t// Chrome on Android with user-scalable=\"no\" doesn't need FastClick (issue #89)\n\
+\t\t\t\tif (metaViewport.content.indexOf('user-scalable=no') !== -1) {\n\
+\t\t\t\t\treturn true;\n\
+\t\t\t\t}\n\
+\t\t\t\t// Chrome 32 and above with width=device-width or less don't need FastClick\n\
+\t\t\t\tif (chromeVersion > 31 && window.innerWidth <= window.screen.width) {\n\
+\t\t\t\t\treturn true;\n\
+\t\t\t\t}\n\
 \t\t\t}\n\
 \n\
 \t\t// Chrome desktop doesn't need FastClick (issue #15)\n\
@@ -1844,22 +1873,7 @@ Toggles.prototype.dragMove = function(e) {\n\
 \n\
 Toggles.prototype.dragEnd = function(e) {\n\
   if (!this.drag.dragging) return;\n\
-\n\
-  if (!this.opts.round) {\n\
-    return this.setIndex(this.state, {animate: true, move: true});\n\
-  }\n\
-\n\
-  var distance = pageX(e) - this.drag.pageX + this.drag.offset,\n\
-      newIndex = Math.round(distance / this.stepLength);\n\
-\n\
-  if (newIndex < 0) {\n\
-    this.setIndex(0, {animate: true, move: true});\n\
-  } else if (newIndex > this.states.length - 1) {\n\
-    this.setIndex(this.states.length - 1, {animate: true, move: true});\n\
-  } else {\n\
-    this.setIndex(newIndex, {animate: true, move: true});\n\
-  }\n\
-\n\
+  this.setIndex(this.index, {animate: true, move: true});\n\
   this.drag.dragging = false;\n\
   this.$el.remove('toggles-dragging');\n\
   return false;\n\
@@ -1981,7 +1995,6 @@ require.alias("component-indexof/index.js", "component-classes/deps/indexof/inde
 
 require.alias("component-emitter/index.js", "toggles/deps/emitter/index.js");
 require.alias("component-emitter/index.js", "emitter/index.js");
-require.alias("component-indexof/index.js", "component-emitter/deps/indexof/index.js");
 
 require.alias("component-event/index.js", "toggles/deps/event/index.js");
 require.alias("component-event/index.js", "event/index.js");

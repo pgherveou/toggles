@@ -199,183 +199,6 @@ require.relative = function(parent) {
 
   return localRequire;
 };
-require.register("component-indexof/index.js", Function("exports, require, module",
-"module.exports = function(arr, obj){\n\
-  if (arr.indexOf) return arr.indexOf(obj);\n\
-  for (var i = 0; i < arr.length; ++i) {\n\
-    if (arr[i] === obj) return i;\n\
-  }\n\
-  return -1;\n\
-};//@ sourceURL=component-indexof/index.js"
-));
-require.register("component-classes/index.js", Function("exports, require, module",
-"/**\n\
- * Module dependencies.\n\
- */\n\
-\n\
-var index = require('indexof');\n\
-\n\
-/**\n\
- * Whitespace regexp.\n\
- */\n\
-\n\
-var re = /\\s+/;\n\
-\n\
-/**\n\
- * toString reference.\n\
- */\n\
-\n\
-var toString = Object.prototype.toString;\n\
-\n\
-/**\n\
- * Wrap `el` in a `ClassList`.\n\
- *\n\
- * @param {Element} el\n\
- * @return {ClassList}\n\
- * @api public\n\
- */\n\
-\n\
-module.exports = function(el){\n\
-  return new ClassList(el);\n\
-};\n\
-\n\
-/**\n\
- * Initialize a new ClassList for `el`.\n\
- *\n\
- * @param {Element} el\n\
- * @api private\n\
- */\n\
-\n\
-function ClassList(el) {\n\
-  if (!el) throw new Error('A DOM element reference is required');\n\
-  this.el = el;\n\
-  this.list = el.classList;\n\
-}\n\
-\n\
-/**\n\
- * Add class `name` if not already present.\n\
- *\n\
- * @param {String} name\n\
- * @return {ClassList}\n\
- * @api public\n\
- */\n\
-\n\
-ClassList.prototype.add = function(name){\n\
-  // classList\n\
-  if (this.list) {\n\
-    this.list.add(name);\n\
-    return this;\n\
-  }\n\
-\n\
-  // fallback\n\
-  var arr = this.array();\n\
-  var i = index(arr, name);\n\
-  if (!~i) arr.push(name);\n\
-  this.el.className = arr.join(' ');\n\
-  return this;\n\
-};\n\
-\n\
-/**\n\
- * Remove class `name` when present, or\n\
- * pass a regular expression to remove\n\
- * any which match.\n\
- *\n\
- * @param {String|RegExp} name\n\
- * @return {ClassList}\n\
- * @api public\n\
- */\n\
-\n\
-ClassList.prototype.remove = function(name){\n\
-  if ('[object RegExp]' == toString.call(name)) {\n\
-    return this.removeMatching(name);\n\
-  }\n\
-\n\
-  // classList\n\
-  if (this.list) {\n\
-    this.list.remove(name);\n\
-    return this;\n\
-  }\n\
-\n\
-  // fallback\n\
-  var arr = this.array();\n\
-  var i = index(arr, name);\n\
-  if (~i) arr.splice(i, 1);\n\
-  this.el.className = arr.join(' ');\n\
-  return this;\n\
-};\n\
-\n\
-/**\n\
- * Remove all classes matching `re`.\n\
- *\n\
- * @param {RegExp} re\n\
- * @return {ClassList}\n\
- * @api private\n\
- */\n\
-\n\
-ClassList.prototype.removeMatching = function(re){\n\
-  var arr = this.array();\n\
-  for (var i = 0; i < arr.length; i++) {\n\
-    if (re.test(arr[i])) {\n\
-      this.remove(arr[i]);\n\
-    }\n\
-  }\n\
-  return this;\n\
-};\n\
-\n\
-/**\n\
- * Toggle class `name`.\n\
- *\n\
- * @param {String} name\n\
- * @return {ClassList}\n\
- * @api public\n\
- */\n\
-\n\
-ClassList.prototype.toggle = function(name){\n\
-  // classList\n\
-  if (this.list) {\n\
-    this.list.toggle(name);\n\
-    return this;\n\
-  }\n\
-\n\
-  // fallback\n\
-  if (this.has(name)) {\n\
-    this.remove(name);\n\
-  } else {\n\
-    this.add(name);\n\
-  }\n\
-  return this;\n\
-};\n\
-\n\
-/**\n\
- * Return an array of classes.\n\
- *\n\
- * @return {Array}\n\
- * @api public\n\
- */\n\
-\n\
-ClassList.prototype.array = function(){\n\
-  var str = this.el.className.replace(/^\\s+|\\s+$/g, '');\n\
-  var arr = str.split(re);\n\
-  if ('' === arr[0]) arr.shift();\n\
-  return arr;\n\
-};\n\
-\n\
-/**\n\
- * Check if class `name` is present.\n\
- *\n\
- * @param {String} name\n\
- * @return {ClassList}\n\
- * @api public\n\
- */\n\
-\n\
-ClassList.prototype.has =\n\
-ClassList.prototype.contains = function(name){\n\
-  return this.list\n\
-    ? this.list.contains(name)\n\
-    : !! ~index(this.array(), name);\n\
-};\n\
-//@ sourceURL=component-classes/index.js"
-));
 require.register("component-emitter/index.js", Function("exports, require, module",
 "\n\
 /**\n\
@@ -1674,8 +1497,7 @@ require.register("toggles/index.js", Function("exports, require, module",
  * module dependencies\n\
  */\n\
 \n\
-var classes = require('classes'),\n\
-    emitter = require('emitter'),\n\
+var emitter = require('emitter'),\n\
     Events  = require('event'),\n\
     delegate = require('delegate'),\n\
     prefix = require('prefix'),\n\
@@ -1727,7 +1549,6 @@ var defaults = {\n\
 \n\
 function Toggles(el, opts) {\n\
   this.el = el;\n\
-  this.$el = classes(el);\n\
   this.drag = {};\n\
   this.handle = query('.toggle-handle', el);\n\
   this.progress = query('.toggle-progress', el);\n\
@@ -1747,6 +1568,7 @@ function Toggles(el, opts) {\n\
 \n\
   // bind instance methods\n\
   this.clickState = this.clickState.bind(this);\n\
+  this.resetAnimate = this.resetAnimate.bind(this);\n\
   this.dragStart = this.dragStart.bind(this);\n\
   this.dragMove = this.dragMove.bind(this);\n\
   this.dragEnd = this.dragEnd.bind(this);\n\
@@ -1806,7 +1628,7 @@ Toggles.prototype.destroy = function() {\n\
   delegate.unbind(this.el, '.toggle-states [data-state]', 'click',\n\
     this.clickState);\n\
 \n\
-  this.$el = this.el = this.progress = this.handle = null;\n\
+  this.el = this.progress = this.handle = null;\n\
 };\n\
 \n\
 /**\n\
@@ -1814,6 +1636,7 @@ Toggles.prototype.destroy = function() {\n\
  */\n\
 \n\
 Toggles.prototype.clickState = function (e) {\n\
+  console.log(e.currentTarget);\n\
   this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});\n\
 };\n\
 \n\
@@ -1832,9 +1655,6 @@ Toggles.prototype.dragStart = function(e) {\n\
     dragging: true,\n\
     pageX: pageX(e)\n\
   };\n\
-\n\
-  // add class\n\
-  this.$el.add('toggles-dragging');\n\
 };\n\
 \n\
 /**\n\
@@ -1846,6 +1666,8 @@ Toggles.prototype.dragStart = function(e) {\n\
 Toggles.prototype.dragMove = function(e) {\n\
   if (!this.drag.dragging) return;\n\
   if (hasTouch && e.touches.length && e.touches.length > 1) return;\n\
+\n\
+  e.preventDefault();\n\
 \n\
   var distance = pageX(e) - this.drag.pageX + this.drag.offset,\n\
       newIndex = Math.round(distance / this.stepLength);\n\
@@ -1862,7 +1684,6 @@ Toggles.prototype.dragMove = function(e) {\n\
 \n\
   this.move(distance);\n\
   this.setIndex(newIndex, {animate: false, move: false});\n\
-  return false;\n\
 };\n\
 \n\
 /**\n\
@@ -1873,9 +1694,10 @@ Toggles.prototype.dragMove = function(e) {\n\
 \n\
 Toggles.prototype.dragEnd = function(e) {\n\
   if (!this.drag.dragging) return;\n\
-  this.setIndex(this.index, {animate: true, move: true});\n\
+  e.preventDefault();\n\
+\n\
   this.drag.dragging = false;\n\
-  this.$el.remove('toggles-dragging');\n\
+  this.setIndex(this.index, {animate: true, move: true});\n\
   return false;\n\
 };\n\
 \n\
@@ -1898,72 +1720,65 @@ Toggles.prototype.setState = function (state, opts) {\n\
  */\n\
 \n\
 Toggles.prototype.setIndex = function(index, opts) {\n\
-  var oldIndex = this.index;\n\
+  var update = this.index !== index;\n\
 \n\
-  if (oldIndex !== index) {\n\
+  if (update) {\n\
     this.index = index;\n\
     this.state = this.states[index];\n\
     this.el.dataset.state = this.state;\n\
+    if (!opts.silent) this.emit('toggle', {state: this.state});\n\
   }\n\
 \n\
   var _this = this,\n\
+    animate = opts.animate && (this.x !== index * this.stepLength)\n\
     style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;\n\
 \n\
-  if (opts.animate && this.progress) this.progress.style[transition] = style;\n\
-  if (opts.animate && this.handle) this.handle.style[transition] = style;\n\
-\n\
-  function done() {\n\
-\n\
-    // unbind\n\
-    Events.unbind(_this.handle, transitionend, done);\n\
-\n\
-    // reset style\n\
-    _this.handle.style[transition] = '';\n\
-    if (_this.progress) _this.progress.style[transition] = '';\n\
-\n\
-    // remove classe\n\
-    _this.$el.remove('toggles-animating');\n\
-    if (!opts.silent && (oldIndex !== index)) {\n\
-      _this.emit('toggle', {state: _this.state});\n\
-    }\n\
+  if (animate) {\n\
+    if (this.progress) this.progress.style[transition] = style;\n\
+    if (this.handle) this.handle.style[transition] = style;\n\
+    Events.bind(this.handle, transitionend, this.resetAnimate);\n\
   }\n\
 \n\
+  if (opts.move) this.moveToIndex(index);\n\
+};\n\
 \n\
-  if (opts.move && this.moveToIndex(index) && opts.animate) {\n\
-    this.$el.add('toggles-animating');\n\
-    Events.bind(this.handle, transitionend, done);\n\
-  } else {\n\
-    done();\n\
-  }\n\
+\n\
+/**\n\
+ * reset animation\n\
+ * @private\n\
+ */\n\
+\n\
+Toggles.prototype.resetAnimate = function () {\n\
+  Events.unbind(this.handle, transitionend, this.resetAnimate);\n\
+  if (this.handle) this.handle.style[transition] = '';\n\
+  if (this.progress) this.progress.style[transition] = '';\n\
 };\n\
 \n\
 \n\
 /**\n\
  * move handle to index\n\
  *\n\
+ * @param {Number} index\n\
  * @return {Boolean} true if x position has changed\n\
  * @api private\n\
  */\n\
 \n\
 Toggles.prototype.moveToIndex = function(index) {\n\
-  return this.move(index * this.stepLength);\n\
+  this.move(index * this.stepLength);\n\
 };\n\
 \n\
 /**\n\
  * move handle and progress\n\
+ * @param {Number} x\n\
  *\n\
- * @return {Boolean} true if x position has changed\n\
  * @api private\n\
  */\n\
 \n\
 Toggles.prototype.move = function(x) {\n\
-  if (this.x === x) return false;\n\
+  if (this.x === x) return;\n\
   this.x = x;\n\
-\n\
-\n\
   if (this.progress) translate(this.progress, x, 0, 0);\n\
-  translate(this.handle, x, 0, 0);\n\
-  return true;\n\
+  if (this.handle) translate(this.handle, x, 0, 0);\n\
 };\n\
 \n\
 \n\
@@ -1986,12 +1801,6 @@ Toggles.prototype.move = function(x) {\n\
 
 
 
-
-
-
-require.alias("component-classes/index.js", "toggles/deps/classes/index.js");
-require.alias("component-classes/index.js", "classes/index.js");
-require.alias("component-indexof/index.js", "component-classes/deps/indexof/index.js");
 
 require.alias("component-emitter/index.js", "toggles/deps/emitter/index.js");
 require.alias("component-emitter/index.js", "emitter/index.js");

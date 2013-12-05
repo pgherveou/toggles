@@ -6,7 +6,6 @@
   "license": "MIT",
   "keywords": [],
   "dependencies": {
-    "component/classes": "*",
     "component/emitter": "*",
     "component/event": "*",
     "component/delegate": "*",

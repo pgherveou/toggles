@@ -2,8 +2,7 @@
  * module dependencies
  */
 
-var classes = require('classes'),
-    emitter = require('emitter'),
+var emitter = require('emitter'),
     Events  = require('event'),
     delegate = require('delegate'),
     prefix = require('prefix'),
@@ -55,7 +54,6 @@ var defaults = {
 
 function Toggles(el, opts) {
   this.el = el;
-  this.$el = classes(el);
   this.drag = {};
   this.handle = query('.toggle-handle', el);
   this.progress = query('.toggle-progress', el);
@@ -75,6 +73,7 @@ function Toggles(el, opts) {
 
   // bind instance methods
   this.clickState = this.clickState.bind(this);
+  this.resetAnimate = this.resetAnimate.bind(this);
   this.dragStart = this.dragStart.bind(this);
   this.dragMove = this.dragMove.bind(this);
   this.dragEnd = this.dragEnd.bind(this);
@@ -134,7 +133,7 @@ Toggles.prototype.destroy = function() {
   delegate.unbind(this.el, '.toggle-states [data-state]', 'click',
     this.clickState);
 
-  this.$el = this.el = this.progress = this.handle = null;
+  this.el = this.progress = this.handle = null;
 };
 
 /**
@@ -142,6 +141,7 @@ Toggles.prototype.destroy = function() {
  */
 
 Toggles.prototype.clickState = function (e) {
+  console.log(e.currentTarget);
   this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});
 };
 
@@ -160,9 +160,6 @@ Toggles.prototype.dragStart = function(e) {
     dragging: true,
     pageX: pageX(e)
   };
-
-  // add class
-  this.$el.add('toggles-dragging');
 };
 
 /**
@@ -174,6 +171,8 @@ Toggles.prototype.dragStart = function(e) {
 Toggles.prototype.dragMove = function(e) {
   if (!this.drag.dragging) return;
   if (hasTouch && e.touches.length && e.touches.length > 1) return;
+
+  e.preventDefault();
 
   var distance = pageX(e) - this.drag.pageX + this.drag.offset,
       newIndex = Math.round(distance / this.stepLength);
@@ -190,7 +189,6 @@ Toggles.prototype.dragMove = function(e) {
 
   this.move(distance);
   this.setIndex(newIndex, {animate: false, move: false});
-  return false;
 };
 
 /**
@@ -201,9 +199,10 @@ Toggles.prototype.dragMove = function(e) {
 
 Toggles.prototype.dragEnd = function(e) {
   if (!this.drag.dragging) return;
-  this.setIndex(this.index, {animate: true, move: true});
+  e.preventDefault();
+
   this.drag.dragging = false;
-  this.$el.remove('toggles-dragging');
+  this.setIndex(this.index, {animate: true, move: true});
   return false;
 };
 
@@ -226,72 +225,65 @@ Toggles.prototype.setState = function (state, opts) {
  */
 
 Toggles.prototype.setIndex = function(index, opts) {
-  var oldIndex = this.index;
+  var update = this.index !== index;
 
-  if (oldIndex !== index) {
+  if (update) {
     this.index = index;
     this.state = this.states[index];
     this.el.dataset.state = this.state;
+    if (!opts.silent) this.emit('toggle', {state: this.state});
   }
 
   var _this = this,
+    animate = opts.animate && (this.x !== index * this.stepLength)
     style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
 
-  if (opts.animate && this.progress) this.progress.style[transition] = style;
-  if (opts.animate && this.handle) this.handle.style[transition] = style;
-
-  function done() {
-
-    // unbind
-    Events.unbind(_this.handle, transitionend, done);
-
-    // reset style
-    _this.handle.style[transition] = '';
-    if (_this.progress) _this.progress.style[transition] = '';
-
-    // remove classe
-    _this.$el.remove('toggles-animating');
-    if (!opts.silent && (oldIndex !== index)) {
-      _this.emit('toggle', {state: _this.state});
-    }
+  if (animate) {
+    if (this.progress) this.progress.style[transition] = style;
+    if (this.handle) this.handle.style[transition] = style;
+    Events.bind(this.handle, transitionend, this.resetAnimate);
   }
 
+  if (opts.move) this.moveToIndex(index);
+};
 
-  if (opts.move && this.moveToIndex(index) && opts.animate) {
-    this.$el.add('toggles-animating');
-    Events.bind(this.handle, transitionend, done);
-  } else {
-    done();
-  }
+
+/**
+ * reset animation
+ * @private
+ */
+
+Toggles.prototype.resetAnimate = function () {
+  Events.unbind(this.handle, transitionend, this.resetAnimate);
+  if (this.handle) this.handle.style[transition] = '';
+  if (this.progress) this.progress.style[transition] = '';
 };
 
 
 /**
  * move handle to index
  *
+ * @param {Number} index
  * @return {Boolean} true if x position has changed
  * @api private
  */
 
 Toggles.prototype.moveToIndex = function(index) {
-  return this.move(index * this.stepLength);
+  this.move(index * this.stepLength);
 };
 
 /**
  * move handle and progress
+ * @param {Number} x
  *
- * @return {Boolean} true if x position has changed
  * @api private
  */
 
 Toggles.prototype.move = function(x) {
-  if (this.x === x) return false;
+  if (this.x === x) return;
   this.x = x;
-
-
   if (this.progress) translate(this.progress, x, 0, 0);
-  translate(this.handle, x, 0, 0);
-  return true;
+  if (this.handle) translate(this.handle, x, 0, 0);
 };
 
 

@@ -213,7 +213,10 @@ Toggles.prototype.dragEnd = function(e) {
  */
 
 Toggles.prototype.setState = function (state, opts) {
-  this.setIndex(this.states.indexOf(state), opts);
+  this.setIndex(this.states.indexOf(state), opts || {
+      animate: true,
+      move: true
+  });
 };
 
 /**

@@ -141,7 +141,6 @@ Toggles.prototype.destroy = function() {
  */
 
 Toggles.prototype.clickState = function (e) {
-  console.log(e.currentTarget);
   this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});
 };
 

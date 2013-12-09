@@ -141,7 +141,9 @@ Toggles.prototype.destroy = function() {
  */
 
 Toggles.prototype.clickState = function (e) {
-  this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});
+  if(!e.delegateTarget.dataset.disabled) {
+    this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});
+  }
 };
 
 /**

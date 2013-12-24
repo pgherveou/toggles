@@ -218,7 +218,7 @@ Toggles.prototype.setState = function (state, opts) {
   this.setIndex(this.states.indexOf(state), opts || {
       animate: true,
       move: true
-  });
+    });
 };
 
 /**
@@ -238,9 +238,8 @@ Toggles.prototype.setIndex = function(index, opts) {
     if (!opts.silent) this.emit('toggle', {state: this.state});
   }
 
-  var _this = this,
-    animate = opts.animate && (this.x !== index * this.stepLength)
-    style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
+  var animate = opts.animate && (this.x !== index * this.stepLength),
+      style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;
 
   if (animate) {
     if (this.progress) this.progress.style[transition] = style;

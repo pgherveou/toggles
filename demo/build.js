@@ -1636,8 +1636,9 @@ Toggles.prototype.destroy = function() {\n\
  */\n\
 \n\
 Toggles.prototype.clickState = function (e) {\n\
-  console.log(e.currentTarget);\n\
-  this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});\n\
+  if(!e.delegateTarget.dataset.disabled) {\n\
+    this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});\n\
+  }\n\
 };\n\
 \n\
 /**\n\
@@ -1709,7 +1710,10 @@ Toggles.prototype.dragEnd = function(e) {\n\
  */\n\
 \n\
 Toggles.prototype.setState = function (state, opts) {\n\
-  this.setIndex(this.states.indexOf(state), opts);\n\
+  this.setIndex(this.states.indexOf(state), opts || {\n\
+      animate: true,\n\
+      move: true\n\
+    });\n\
 };\n\
 \n\
 /**\n\
@@ -1729,9 +1733,8 @@ Toggles.prototype.setIndex = function(index, opts) {\n\
     if (!opts.silent) this.emit('toggle', {state: this.state});\n\
   }\n\
 \n\
-  var _this = this,\n\
-    animate = opts.animate && (this.x !== index * this.stepLength)\n\
-    style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;\n\
+  var animate = opts.animate && (this.x !== index * this.stepLength),\n\
+      style = 'all ' + this.opts.transitionSpeed + 's ' + this.opts.easing;\n\
 \n\
   if (animate) {\n\
     if (this.progress) this.progress.style[transition] = style;\n\

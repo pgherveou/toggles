@@ -1549,7 +1549,7 @@ var defaults = {\n\
 \n\
 function Toggles(el, opts) {\n\
   this.el = el;\n\
-  this.drag = {};\n\
+  this.drag = {dragging: false, distance: 0};\n\
   this.handle = query('.toggle-handle', el);\n\
   this.progress = query('.toggle-progress', el);\n\
   this.states = [].map.call(query.all('[data-state]', el), function (node) {\n\
@@ -1636,9 +1636,11 @@ Toggles.prototype.destroy = function() {\n\
  */\n\
 \n\
 Toggles.prototype.clickState = function (e) {\n\
-  if(!e.delegateTarget.dataset.disabled) {\n\
-    this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});\n\
-  }\n\
+  if(e.delegateTarget.dataset.disabled) return;\n\
+  this.setState(e.delegateTarget.dataset.state, {\n\
+    move: true,\n\
+    animate: true\n\
+  });\n\
 };\n\
 \n\
 /**\n\
@@ -1651,8 +1653,8 @@ Toggles.prototype.dragStart = function(e) {\n\
 \n\
   // save drag state\n\
   this.drag = {\n\
-    index: this.index,\n\
     offset: this.x,\n\
+    distance: 0,\n\
     dragging: true,\n\
     pageX: pageX(e)\n\
   };\n\
@@ -1683,6 +1685,7 @@ Toggles.prototype.dragMove = function(e) {\n\
     newIndex = Math.round(distance / this.stepLength);\n\
   }\n\
 \n\
+  this.drag.distance = distance;\n\
   this.move(distance);\n\
   this.setIndex(newIndex, {animate: false, move: false});\n\
 };\n\
@@ -1697,7 +1700,27 @@ Toggles.prototype.dragEnd = function(e) {\n\
   if (!this.drag.dragging) return;\n\
   e.preventDefault();\n\
 \n\
+  var distance = this.drag.distance,\n\
+      toggleState;\n\
+\n\
+  // reset\n\
   this.drag.dragging = false;\n\
+  this.drag.offset = 0;\n\
+  this.drag.distance = 0;\n\
+\n\
+  // toggle state when user clicked on handler\n\
+  // and toggles has only two states\n\
+\n\
+  if ((distance < 5) && this.states.length === 2 ) {\n\
+\n\
+    // toggle\n\
+    toggleState = this.states[(1 + this.index) % 2];\n\
+    return this.setState(toggleState, {\n\
+      move: true,\n\
+      animate: true\n\
+    });\n\
+  }\n\
+\n\
   this.setIndex(this.index, {animate: true, move: true});\n\
   return false;\n\
 };\n\

@@ -54,7 +54,7 @@ var defaults = {
 
 function Toggles(el, opts) {
   this.el = el;
-  this.drag = {};
+  this.drag = {dragging: false, distance: 0};
   this.handle = query('.toggle-handle', el);
   this.progress = query('.toggle-progress', el);
   this.states = [].map.call(query.all('[data-state]', el), function (node) {
@@ -141,9 +141,11 @@ Toggles.prototype.destroy = function() {
  */
 
 Toggles.prototype.clickState = function (e) {
-  if(!e.delegateTarget.dataset.disabled) {
-    this.setState(e.delegateTarget.dataset.state, {move: true, animate: true});
-  }
+  if(e.delegateTarget.dataset.disabled) return;
+  this.setState(e.delegateTarget.dataset.state, {
+    move: true,
+    animate: true
+  });
 };
 
 /**
@@ -156,8 +158,8 @@ Toggles.prototype.dragStart = function(e) {
 
   // save drag state
   this.drag = {
-    index: this.index,
     offset: this.x,
+    distance: 0,
     dragging: true,
     pageX: pageX(e)
   };
@@ -188,6 +190,7 @@ Toggles.prototype.dragMove = function(e) {
     newIndex = Math.round(distance / this.stepLength);
   }
 
+  this.drag.distance = distance;
   this.move(distance);
   this.setIndex(newIndex, {animate: false, move: false});
 };
@@ -202,7 +205,27 @@ Toggles.prototype.dragEnd = function(e) {
   if (!this.drag.dragging) return;
   e.preventDefault();
 
+  var distance = this.drag.distance,
+      toggleState;
+
+  // reset
   this.drag.dragging = false;
+  this.drag.offset = 0;
+  this.drag.distance = 0;
+
+  // toggle state when user clicked on handler
+  // and toggles has only two states
+
+  if ((distance < 5) && this.states.length === 2 ) {
+
+    // toggle
+    toggleState = this.states[(1 + this.index) % 2];
+    return this.setState(toggleState, {
+      move: true,
+      animate: true
+    });
+  }
+
   this.setIndex(this.index, {animate: true, move: true});
   return false;
 };

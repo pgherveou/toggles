@@ -141,7 +141,7 @@ Toggles.prototype.destroy = function() {
  */
 
 Toggles.prototype.clickState = function (e) {
-  if(e.delegateTarget.dataset.disabled) return;
+  if(e.delegateTarget.dataset.disabled === 'true') return;
   this.setState(e.delegateTarget.dataset.state, {
     move: true,
     animate: true

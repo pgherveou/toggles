@@ -24,6 +24,7 @@ module.exports = function(grunt) {
         options: {
           port: 3000,
           base: '',
+          hostname: '0.0.0.0',
           livereload: 35730,
           open: 'http://localhost:3000/demo'
         }

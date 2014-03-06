@@ -130,9 +130,7 @@ Toggles.prototype.destroy = function() {
   Events.unbind(this.handle, evs.start, this.dragStart);
   Events.unbind(document.body, evs.move, this.dragMove);
   Events.unbind(document.body, evs.end,  this.dragEnd);
-  delegate.unbind(this.el, '.toggle-states [data-state]', 'click',
-    this.clickState);
-
+  delegate.unbind(this.el, 'click', this.clickState);
   this.el = this.progress = this.handle = null;
 };
 
@@ -177,22 +175,23 @@ Toggles.prototype.dragMove = function(e) {
 
   e.preventDefault();
 
-  var distance = pageX(e) - this.drag.pageX + this.drag.offset,
-      newIndex = Math.round(distance / this.stepLength);
+  var offsetDistance = pageX(e) + this.drag.offset - this.drag.pageX,
+      newIndex = Math.round(offsetDistance / this.stepLength);
 
-  if (distance > this.toggleWidth) {
-    distance = this.toggleWidth;
+  if (offsetDistance > this.toggleWidth) {
+    offsetDistance = this.toggleWidth;
     newIndex = this.states.length - 1;
-  } else if (distance < 0) {
-    distance = 0;
+  } else if (offsetDistance < 0) {
+    offsetDistance = 0;
     newIndex = 0;
   } else {
-    newIndex = Math.round(distance / this.stepLength);
+    newIndex = Math.round(offsetDistance / this.stepLength);
   }
 
-  this.drag.distance = distance;
-  this.move(distance);
+
+  this.move(offsetDistance);
   this.setIndex(newIndex, {animate: false, move: false});
+  this.drag.distance = Math.abs(offsetDistance - this.drag.offset);
 };
 
 /**

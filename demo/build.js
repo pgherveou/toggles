@@ -1625,9 +1625,7 @@ Toggles.prototype.destroy = function() {\n\
   Events.unbind(this.handle, evs.start, this.dragStart);\n\
   Events.unbind(document.body, evs.move, this.dragMove);\n\
   Events.unbind(document.body, evs.end,  this.dragEnd);\n\
-  delegate.unbind(this.el, '.toggle-states [data-state]', 'click',\n\
-    this.clickState);\n\
-\n\
+  delegate.unbind(this.el, 'click', this.clickState);\n\
   this.el = this.progress = this.handle = null;\n\
 };\n\
 \n\
@@ -1636,7 +1634,7 @@ Toggles.prototype.destroy = function() {\n\
  */\n\
 \n\
 Toggles.prototype.clickState = function (e) {\n\
-  if(e.delegateTarget.dataset.disabled) return;\n\
+  if(e.delegateTarget.dataset.disabled === 'true') return;\n\
   this.setState(e.delegateTarget.dataset.state, {\n\
     move: true,\n\
     animate: true\n\
@@ -1672,22 +1670,23 @@ Toggles.prototype.dragMove = function(e) {\n\
 \n\
   e.preventDefault();\n\
 \n\
-  var distance = pageX(e) - this.drag.pageX + this.drag.offset,\n\
-      newIndex = Math.round(distance / this.stepLength);\n\
+  var offsetDistance = pageX(e) + this.drag.offset - this.drag.pageX,\n\
+      newIndex = Math.round(offsetDistance / this.stepLength);\n\
 \n\
-  if (distance > this.toggleWidth) {\n\
-    distance = this.toggleWidth;\n\
+  if (offsetDistance > this.toggleWidth) {\n\
+    offsetDistance = this.toggleWidth;\n\
     newIndex = this.states.length - 1;\n\
-  } else if (distance < 0) {\n\
-    distance = 0;\n\
+  } else if (offsetDistance < 0) {\n\
+    offsetDistance = 0;\n\
     newIndex = 0;\n\
   } else {\n\
-    newIndex = Math.round(distance / this.stepLength);\n\
+    newIndex = Math.round(offsetDistance / this.stepLength);\n\
   }\n\
 \n\
-  this.drag.distance = distance;\n\
-  this.move(distance);\n\
+\n\
+  this.move(offsetDistance);\n\
   this.setIndex(newIndex, {animate: false, move: false});\n\
+  this.drag.distance = Math.abs(offsetDistance - this.drag.offset);\n\
 };\n\
 \n\
 /**\n\

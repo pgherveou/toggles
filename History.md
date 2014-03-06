@@ -1,4 +1,10 @@
 
+0.0.9 / 2014-03-05
+==================
+
+ * fix sliding issue destroy method on firefox
+ * check data-disabled against "true" string
+
 0.0.6 / 2013-12-05
 ==================
 
